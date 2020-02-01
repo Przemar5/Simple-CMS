@@ -5,72 +5,71 @@ require_once(CONNECTION);
 
 class Page
 {
-	private $db;
-	
 	
 	public function __construct()
 	{
-		$this->db = Connection::getInstance();
+		//Connection::getInstance() = Connection::getInstance();
+		
 	}
 	
 	
-	public function slugById($id)
+	public static function slugById($id)
 	{
 		$sql = 'SELECT slug
 				FROM pages
 				WHERE id = :id';
 		$param = ['id' => $id];
-		$stmt = $this->db->prepare($sql);
+		$stmt = Connection::getInstance()->prepare($sql);
 		$stmt->execute($param);
 		
 		return $stmt->fetch(PDO::FETCH_OBJ)->slug;
 	}
 	
 	
-	public function idBySlug($slug)
+	public static function idBySlug($slug)
 	{
 		$sql = 'SELECT id
 				FROM pages
 				WHERE slug = :slug';
 		$param = ['slug' => $slug];
-		$stmt = $this->db->prepare($sql);
+		$stmt = Connection::getInstance()->prepare($sql);
 		$stmt->execute($param);
 		
 		return $stmt->fetch(PDO::FETCH_OBJ)->id;
 	}
 
 	
-    public function all()
+    public static function all()
     {
         $sql = 'SELECT id, label, title, slug 
 				FROM pages 
 				ORDER BY created_at DESC';
-		$stmt = $this->db->prepare($sql);
+		$stmt = Connection::getInstance()->prepare($sql);
 		$stmt->execute();
 		
 		return $stmt;
     }
 	
 	
-	public function select($id)
+	public static function select($id)
 	{
 		$sql = 'SELECT *
 				FROM pages
 				WHERE id = :id';
 		$param = ['id' => $id];
-		$stmt = $this->db->prepare($sql);
+		$stmt = Connection::getInstance()->prepare($sql);
 		$stmt->execute($param);
 		
 		return $stmt;
 	}
 	
 	
-	public function insert($request)
+	public static function insert($request)
 	{
 		$sql = 'INSERT INTO pages 
 					(label, title, slug, body) 
 				VALUES (:label, :title, :slug, :body)';
-		$stmt = $this->db->prepare($sql);
+		$stmt = Connection::getInstance()->prepare($sql);
 		$stmt->execute($request);
 		$rows = $stmt->rowCount();
 		
@@ -78,7 +77,7 @@ class Page
 	}
 	
 	
-	public function update($request)
+	public static function update($request)
 	{
 		$sql = 'UPDATE pages
 				SET title = :title,
@@ -86,7 +85,7 @@ class Page
 					slug = :slug,
 					body = :body
 				WHERE id = :id';
-		$stmt = $this->db->prepare($sql);
+		$stmt = Connection::getInstance()->prepare($sql);
 		$stmt->execute($request);
 		$rows = $stmt->rowCount();
 		
@@ -94,13 +93,13 @@ class Page
 	}
 	
 	
-	public function delete($id)
+	public static function delete($id)
 	{
         $sql = 'DELETE FROM pages 
 				WHERE id=:id';
         $param = ['id' => $id];
 
-        $stmt = $this->db->prepare($sql);
+        $stmt = Connection::getInstance()->prepare($sql);
 		$stmt->execute($param);
 		$rows = $stmt->rowCount();
 		

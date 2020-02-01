@@ -1,4 +1,4 @@
-<?php require_once(VIEW_ROOT . '/templates/header.php'); ?>
+<?php require_once(HEADER); ?>
    
     <?php if(isset($_SESSION['last_action']['success'])): ?>
         <p style="color:green;">
@@ -10,7 +10,7 @@
         </p>
     <?php endif; ?>
     
-    <?php if(empty($data)): ?>
+    <?php if(empty($data['pages'])): ?>
         <p>No pages at the moment.</p>
     <?php else: ?>  
 		<table style="min-width: 400px">
@@ -24,7 +24,7 @@
 				</tr>
 			</thead>
 			<tbody>
-			<?php foreach($data as $page): ?>
+			<?php foreach($data['pages'] as $page): ?>
 				<tr>
 					<td>
 						<?php echo $page['label']; ?>
@@ -33,17 +33,17 @@
 						<?php echo $page['title']; ?>
 					</td>
 					<td>
-						<a href="<?php echo BASE_URL; ?>/page.php?page=<?php echo $page['slug']; ?>">
+						<a href="<?php echo $page['url_show']; ?>">
 							<?php echo $page['slug']; ?>
 						</a>
 					</td>
 					<td>
-						<a href="<?php echo URL['EDIT_PAGE'] . '/' . $page['slug']; ?>">
+						<a type="button" href="<?php echo $page['url_edit']; ?>">
 							Edit
 						</a>
 					</td>
 					<td>
-						<form action="<?php echo URL['DELETE_PAGE']; ?>" method="post">
+						<form action="<?php echo $page['url_delete']; ?>" method="post">
 							<input type="hidden" name="id" value="<?php echo $page['id']; ?>">
 							<input type="submit" value="Delete">
 						</form>
@@ -54,6 +54,6 @@
 		</table>
     <?php endif; ?>
     
-    <a href="<?php echo URL['ADD_PAGE']; ?>">Add new page</a>
+    <a href="<?php echo $data['url_add']; ?>">Add new page</a>
     
-<?php require_once(VIEW_ROOT . '/templates/footer.php'); ?>
+<?php require_once(FOOTER); ?>

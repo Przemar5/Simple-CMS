@@ -1,4 +1,4 @@
-<?php require_once(VIEW_ROOT . '/templates/header.php'); ?>
+<?php require_once(HEADER); ?>
    
     <h1>Home</h1>
     
@@ -6,9 +6,9 @@
     	<p>Sorry, no pages at the moment.</p>
     <?php else: ?>
     <ul>
-        <?php foreach($data as $page): ?>
+        <?php foreach($data['pages'] as $page): ?>
         <li>
-            <a href="<?php echo BASE_URL; ?>/page.php?page=<?php echo $page['slug']; ?>">
+            <a href="<?php echo $page['url_show']; ?>">
                 <?php echo $page['label']; ?>
             </a>
         </li>
@@ -16,4 +16,4 @@
     </ul>
     <?php endif; ?>
     
-<?php require_once(VIEW_ROOT . '/templates/footer.php'); ?>
+<?php require_once(FOOTER); ?>

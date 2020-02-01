@@ -1,7 +1,12 @@
 <?php
 
-require_once('app/paths.php');
-require_once(CONTROLLERS_ROOT . '/PageController.php');
+session_start();
 
-$page = new PageController();
-$page->home();
+require_once('paths.php');
+include_once(ERRORS);
+
+
+$page = isset($_GET['page']) ? $_GET['page'] : '';
+
+
+require_once(ROUTES);

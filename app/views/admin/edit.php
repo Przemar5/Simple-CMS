@@ -1,11 +1,11 @@
-<?php require_once(VIEW_ROOT . '/templates/header.php'); ?>
+<?php require_once(HEADER); ?>
 
     <h2>Edit page</h2>
 
-    <form action="<?php echo URL['UPDATE_PAGE']; ?>" method="post" autocomplete="off">
+    <form action="<?php echo $data['url_update']; ?>" method="post" autocomplete="off">
         <label for="title">
             Title
-            <input type="text" name="title" id="title" value="<?php echo $data['title']; ?>">
+            <input type="text" name="title" id="title" value="<?php echo $data['page']['title']; ?>">
         </label>
        	<?php displayError($errors['title']); ?>
 
@@ -13,7 +13,7 @@
 
         <label for="label">
             Label
-            <input type="text" name="label" id="label" value="<?php echo $data['label']; ?>">
+            <input type="text" name="label" id="label" value="<?php echo $data['page']['label']; ?>">
         </label>
        	<?php displayError($errors['label']); ?>
 
@@ -21,7 +21,7 @@
 
         <label for="slug">
             Slug
-            <input type="text" name="slug" id="slug" value="<?php echo $data['slug']; ?>">
+            <input type="text" name="slug" id="slug" value="<?php echo $data['page']['slug']; ?>">
         </label>
        	<?php displayError($errors['slug']); ?>
 
@@ -29,15 +29,15 @@
 
         <label for="body">
             Body
-            <textarea name="body" id="body"><?php echo $data['body']; ?></textarea>
+            <textarea name="body" id="body"><?php echo $data['page']['body']; ?></textarea>
         </label>
        	<?php displayError($errors['body']); ?>
 
         <br>
         
-        <input type="hidden" name="id" value="<?php echo $data['id']; ?>">
+        <input type="hidden" name="id" value="<?php echo $data['page']['id']; ?>">
        	
         <input type="submit" value="Edit">
     </form>
     
-<?php require_once(VIEW_ROOT . '/templates/footer.php'); ?>
+<?php require_once(FOOTER); ?>

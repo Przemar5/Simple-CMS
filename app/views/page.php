@@ -1,5 +1,9 @@
-<?php require_once(VIEW_ROOT . '/templates/header.php'); ?>
-    <h1><?php echo $data['title']; ?></h1>
+<?php require_once(HEADER); ?>
+    <h1>
+    	<?php echo $data['page']['title']; ?>
+    </h1>
 
-    <p><?php echo $data['body']; ?></p>
-<?php require_once(VIEW_ROOT . '/templates/footer.php'); ?>
+    <p>
+    	<?php echo $data['page']['body']; ?>
+    </p>
+<?php require_once(FOOTER); ?>

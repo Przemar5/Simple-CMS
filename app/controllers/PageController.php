@@ -13,59 +13,63 @@ require_once('Validator.php');
 class PageController
 {
 	const APP_NAME = 'MyCMS';
-    private $pageModel;
-
 	
-    public function __construct()
+    public static function show($slug)
     {
-		$this->pageModel = new Page;
-    }
+		$id = Page::idBySlug($slug);
+		$data['page'] = Page::select($id)->fetch(PDO::FETCH_ASSOC);
+		$data['label'] = self::APP_NAME . ' | ' . $data['page']['label'];
 
-	
-    public function show($slug)
-    {
-		$id = $this->pageModel->idBySlug($slug);
-		$data = $this->pageModel->select($id)->fetch(PDO::FETCH_ASSOC);
-		$page['label'] = self::APP_NAME . ' | ' . $data['label'];
-
-        require_once(VIEW_ROOT . '/page.php');
+        require_once(VIEW['PAGE']);
     }
 	
 
-    public function home()
+    public static function home()
     {
-        $data = $this->pageModel->all()->fetchAll(PDO::FETCH_ASSOC);
-		$page['label'] = self::APP_NAME . ' | Home';
+        $data['pages'] = Page::all()->fetchAll(PDO::FETCH_ASSOC);
+		$data['label'] = self::APP_NAME . ' | Home';
 		
-        require_once(VIEW_ROOT . '/home.php');
+		foreach ($data['pages'] as $key => $value) {
+			$data['pages'][$key]['url_show'] = BASE_URL . '/' . $data['pages'][$key]['slug'];
+		}
+		
+        require_once(VIEW['HOME']);
     }
 	
 
-    public function list()
+    public static function list()
     {
-        $data = $this->pageModel->all()->fetchAll(PDO::FETCH_ASSOC);
-		$page['label'] = self::APP_NAME . ' | Pages';
+        $data['pages'] = Page::all()->fetchAll(PDO::FETCH_ASSOC);
+		$data['label'] = self::APP_NAME . ' | Pages';
+		$data['url_add'] = BASE_URL . '/add';
 
-        require_once(VIEW_ROOT . '/admin/list.php');
+		foreach ($data['pages'] as $key => $value) {
+			$data['pages'][$key]['url_show'] = BASE_URL . '/' . $data['pages'][$key]['slug'];
+			$data['pages'][$key]['url_edit'] = BASE_URL . '/' . $data['pages'][$key]['slug'] . '/edit';
+			$data['pages'][$key]['url_delete'] = BASE_URL . '/' . $data['pages'][$key]['slug'] . '/delete';
+		}
+		
+        require_once(VIEW['LIST_PAGES']);
 		
 		unset($_SESSION['last_action']);
     }
 	
 
-    public function add()
+    public static function add()
     {
-		$data = (!empty($_SESSION['submitted_data'])) ? $_SESSION['submitted_data'] : null;
+		$data['page'] = (!empty($_SESSION['submitted_data'])) ? $_SESSION['submitted_data'] : null;
 		$errors = (!empty($_SESSION['input_errors'])) ? $_SESSION['input_errors'] : null;
-		$page['label'] = self::APP_NAME . ' | Add page';
+		$data['label'] = self::APP_NAME . ' | Add page';
+		$data['url_store'] = BASE_URL . '/store';
 		
-        require_once(VIEW_ROOT . '/admin/add.php');
+        require_once(VIEW['ADD_PAGE']);
 		
 		unset($_SESSION['submitted_data']);
 		unset($_SESSION['input_errors']);
     }
 	
 
-    public function store($request)
+    public static function store($request)
     {
         $rules = [
             'title' => ['required', 'between:7,255', 'regex:[a-zA-Z0-9 _\/\*\+\-\#]', 'unique:pages'],
@@ -76,47 +80,50 @@ class PageController
         $validator = new Validator;
 
         if ($validator->validate($request, $rules)) {
-            if ($this->pageModel->insert($request) === 1) {
+            if (Page::insert($request) === 1) {
                 $_SESSION['last_action']['success'] = 'New page was created successfully.';
             }
             else {
                 $_SESSION['last_action']['error'] = 'Error: new page wasn\'t created.';
             }
 
-            header('Location: ' . BASE_URL . '/admin/list.php');
+            header('Location: ' . BASE_URL . '/admin');
         }
         else {
 			$_SESSION['input_errors'] = $validator->errors;
 			$_SESSION['submitted_data'] = $request;
 
-			header('Location: ' . BASE_URL . '/admin/add.php');
+			header('Location: ' . BASE_URL . '/add');
 		}
     }
 	
 
-    public function edit($slug)
+    public static function edit($slug)
     {
 		if (!empty($_SESSION['submitted_data'])) {
-			$data = $_SESSION['submitted_data'];
+			$data['page'] = $_SESSION['submitted_data'];
 		}
 		else {
-			$id = $this->pageModel->idBySlug($slug);
-			$data = $this->pageModel->select($id)->fetch(PDO::FETCH_ASSOC);
+			$id = Page::idBySlug($slug);
+			$data['page'] = Page::select($id)->fetch(PDO::FETCH_ASSOC);
 		}
 		
 		$errors = (!empty($_SESSION['input_errors'])) ? $_SESSION['input_errors'] : null;
-		$page['label'] = self::APP_NAME . ' | Edit ' . $data['label'];
+		$data['label'] = self::APP_NAME . ' | Edit ' . $data['page']['label'];
+		$data['url_update'] = BASE_URL . '/' . $data['page']['slug'] . '/update';
 		
-        require_once(VIEW_ROOT . '/admin/edit.php');
+        require_once(VIEW['EDIT_PAGE']);
 		
 		unset($_SESSION['submitted_data']);
 		unset($_SESSION['input_errors']);
     }
 	
 	
-    public function update($request)
+    public static function update($request)
     {
-		if (is_numeric($request['id'])) {
+		$id = $request['id'];
+		
+		if (is_numeric($id) && strlen($id) < 11) {
 			$validator = new Validator;
 			$rules = [
 				'title' => ['required', 'between:7,255', 'regex:[a-zA-Z0-9 _\/\*\+\-\#]', 'unique:pages,'.$request['id']],
@@ -126,41 +133,48 @@ class PageController
 			];
 
 			if ($validator->validate($request, $rules)) {
-				if($this->pageModel->update($request) === 1) {
+				if(Page::update($request) === 1) {
 					$_SESSION['last_action']['success'] = 'Page was edited successfully.';
 				} else {
 					$_SESSION['last_action']['error'] = 'Page wasn\'t edited.';
 				}
 				
-				header('Location: ' . BASE_URL . '/admin/list.php');
+				header('Location: ' . BASE_URL . '/admin');
 			}
 			else {
 				$_SESSION['input_errors'] = $validator->errors;
 				$_SESSION['submitted_data'] = $request;
-				$slug = $this->pageModel->slugById($request['id']);
+				$slug = Page::slugById($request['id']);
 
-				header('Location: ' . BASE_URL . '/admin/edit.php?page=' . $slug);
+				header('Location: ' . BASE_URL . '/' . $slug . '/edit');
 			}
 		}
 		else {
 			$_SESSION['last_action']['error'] = 'Error: page wasn\'t edited.';
 
-			header('Location: ' . BASE_URL . '/admin/list.php');
+			header('Location: ' . BASE_URL . '/admin');
 		}
     }
 
 	
-    public function delete($slug)
+    public static function delete($request)
     {
-        $id = $this->pageModel->idBySlug($slug);
+		$id = $request['id'];
 		
-		if ($this->pageModel->delete($id) === 1) {
-			$_SESSION['last_action']['success'] = 'Page was removed successfully.';
+		if (is_numeric($id) && strlen($id) < 11) {
+			if (Page::delete($id) === 1) {
+				$_SESSION['last_action']['success'] = 'Page was removed successfully.';
+			}
+			else {
+				$_SESSION['last_action']['error'] = 'Page wasn\'t removed.';
+			}
+		
+			header('Location: ' . BASE_URL . '/admin');
 		}
 		else {
 			$_SESSION['last_action']['error'] = 'Page wasn\'t removed.';
+		
+			header('Location: ' . BASE_URL . '/admin');
 		}
-
-		header('Location: ' . BASE_URL . '/admin/list.php');
     }
 }

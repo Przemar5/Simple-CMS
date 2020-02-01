@@ -4,8 +4,16 @@ AuthUserFile P:/xampp/htdocs/Files/Projects/SimpleCMS/admin/.htpasswd
 require valid-user
 
 RewriteEngine On
+
 RewriteCond ${REQUEST_FILENAME} !-d
 RewriteCond ${REQUEST_FILENAME} !-f
 RewriteCond ${REQUEST_FILENAME} !-l
-RewriteRule ^admin/(.*)$ admin/admin.php?url=$1 [QSA,L]
-RewriteRule ^admin/(.*)$ admin/$1.php [QSA,L]
+
+RewriteRule ^$ index.php?url=home [NC,L]
+RewriteRule ^home$ index.php?url=home [NC,L]
+RewriteRule ^admin(\/?)$ admin/admin.php?url=list [NC,L]
+RewriteRule ^admin/([0-9a-zA-Z_\-]+)$ admin/admin.php?url=$1 [NC,L]
+RewriteRule ^admin/([0-9a-zA-Z_\-]+)/([0-9a-zA-Z_\-]+)$ admin/admin.php?page=$1&url=$2 [NC,L]
+RewriteRule ^([0-9a-zA-Z_\-]+)/(store|edit|update|delete)$ admin/admin.php?page=$1&url=$2 [NC,L]
+RewriteRule ^(add|store)$ admin/admin.php?url=$1 [NC,L]
+RewriteRule ^([0-9a-zA-Z_\-]+)$ index.php?url=show&page=$1 [NC,L]
