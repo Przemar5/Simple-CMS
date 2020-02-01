@@ -2,7 +2,7 @@
 
     <h2>Edit page</h2>
 
-    <form action="<?php echo BASE_URL; ?>/admin/update.php?page=<?php echo $data['slug']; ?>" method="post" autocomplete="off">
+    <form action="<?php echo URL['UPDATE_PAGE']; ?>" method="post" autocomplete="off">
         <label for="title">
             Title
             <input type="text" name="title" id="title" value="<?php echo $data['title']; ?>">

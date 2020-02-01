@@ -38,14 +38,15 @@
 						</a>
 					</td>
 					<td>
-						<a href="<?php echo BASE_URL; ?>/admin/edit.php?page=<?php echo $page['slug']; ?>">
+						<a href="<?php echo URL['EDIT_PAGE'] . '/' . $page['slug']; ?>">
 							Edit
 						</a>
 					</td>
 					<td>
-						<a href="<?php echo BASE_URL; ?>/admin/delete.php?page=<?php echo $page['slug']; ?>">
-							Delete
-						</a>
+						<form action="<?php echo URL['DELETE_PAGE']; ?>" method="post">
+							<input type="hidden" name="id" value="<?php echo $page['id']; ?>">
+							<input type="submit" value="Delete">
+						</form>
 					</td>
 				</tr>
 			<?php endforeach; ?>
@@ -53,6 +54,6 @@
 		</table>
     <?php endif; ?>
     
-    <a href="<?php echo BASE_URL; ?>/admin/add.php">Add new page</a>
+    <a href="<?php echo URL['ADD_PAGE']; ?>">Add new page</a>
     
 <?php require_once(VIEW_ROOT . '/templates/footer.php'); ?>

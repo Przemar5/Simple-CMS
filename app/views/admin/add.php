@@ -2,7 +2,7 @@
 
     <h2>Add page</h2>
 
-    <form action="<?php echo BASE_URL; ?>/admin/store.php" method="post" autocomplete="off">
+    <form action="<?php echo URL['STORE_PAGE']; ?>" method="post" autocomplete="off">
         <label for="title">
             Title
             <input type="text" name="title" id="title" value="<?php echo $data['title']; ?>">

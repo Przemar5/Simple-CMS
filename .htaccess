@@ -1,0 +1,11 @@
+AuthType Basic
+AuthName "restricted Area"
+AuthUserFile P:/xampp/htdocs/Files/Projects/SimpleCMS/admin/.htpasswd
+require valid-user
+
+RewriteEngine On
+RewriteCond ${REQUEST_FILENAME} !-d
+RewriteCond ${REQUEST_FILENAME} !-f
+RewriteCond ${REQUEST_FILENAME} !-l
+RewriteRule ^admin/(.*)$ admin/admin.php?url=$1 [QSA,L]
+RewriteRule ^admin/(.*)$ admin/$1.php [QSA,L]
