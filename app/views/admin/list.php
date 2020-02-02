@@ -1,25 +1,16 @@
 <?php require_once(HEADER); ?>
    
-    <?php if(isset($_SESSION['last_action']['success'])): ?>
-        <p style="color:green;">
-            <?php echo $_SESSION['last_action']['success']; unset($_SESSION['last_action']['success']); ?>
-        </p>
-    <?php elseif(isset($_SESSION['last_action']['error'])): ?>
-        <p style="color:red;">
-            <?php echo $_SESSION['last_action']['error']; unset($_SESSION['last_action']['error']); ?>
-        </p>
-    <?php endif; ?>
+	<?php include_once(ACTION_FEEDBACK); ?>
     
     <?php if(empty($data['pages'])): ?>
         <p>No pages at the moment.</p>
     <?php else: ?>  
-		<table style="min-width: 400px">
+		<table class="table table-striped" style="min-width: 400px">
 			<thead>
 				<tr>
 					<th>Label</th>
 					<th>Title</th>
 					<th>Slug</th>
-					<th></th>
 					<th></th>
 				</tr>
 			</thead>
@@ -38,14 +29,13 @@
 						</a>
 					</td>
 					<td>
-						<a type="button" href="<?php echo $page['url_edit']; ?>">
+						<a href="<?php echo $page['url_edit']; ?>" class="btn btn-sm btn-primary">
 							Edit
 						</a>
-					</td>
-					<td>
+						
 						<form action="<?php echo $page['url_delete']; ?>" method="post">
 							<input type="hidden" name="id" value="<?php echo $page['id']; ?>">
-							<input type="submit" value="Delete">
+							<input class="btn btn-sm btn-danger" type="submit" value="Delete">
 						</form>
 					</td>
 				</tr>
@@ -54,6 +44,6 @@
 		</table>
     <?php endif; ?>
     
-    <a href="<?php echo $data['url_add']; ?>">Add new page</a>
+    <a href="<?php echo $data['url_add']; ?>" class="btn btn-block btn-primary">Add new page</a>
     
 <?php require_once(FOOTER); ?>

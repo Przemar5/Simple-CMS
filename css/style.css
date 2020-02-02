@@ -1,0 +1,61 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
+
+*,
+*::before,
+*::after {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+html {
+	/* Definition of 1rem - 10px in this case */
+	font-size: 62.5%;
+}
+
+body {
+	font-family: 'Roboto', sans-serif;
+	font-size: 1.6rem;
+	background-color: #d6d6d6;
+}
+
+.wrapper {
+	max-width: 90rem;
+	background-color: #fcfcfc;
+	margin-top: 4.5rem;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 4.5rem 5rem 3rem;
+	height: calc(100vh - 4.5rem);
+}
+
+table {
+	width: 100%;
+}
+
+table tr {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+table > tbody > tr {
+	border-top: 1px solid grey;
+	padding-top: .4rem;
+	padding-bottom: .4rem;
+}
+
+table > th > tr {
+	padding-bottom: .75rem;
+}
+
+tr > td:last-child {
+    display: flex;
+}
+    
+tr > td:last-child > * {
+	margin-left: .5rem;
+	margin-right: 1rem;
+	font-size: inherit;
+	width: 5rem;
+}

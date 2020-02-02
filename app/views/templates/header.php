@@ -8,5 +8,10 @@
         <title>
         	<?php echo $data['label']; ?>
         </title>
+        
+        <link rel="stylesheet" href="<?php echo STYLES; ?>"> 
     </head>
     <body>
+    	<?php include_once(NAVBAR); ?>
+    	
+		<div class="wrapper">

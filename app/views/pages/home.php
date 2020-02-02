@@ -1,5 +1,7 @@
 <?php require_once(HEADER); ?>
    
+    <?php include_once(ACTION_FEEDBACK); ?>
+   	
     <h1>Home</h1>
     
     <?php if(empty($data)): ?>

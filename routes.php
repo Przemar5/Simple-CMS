@@ -3,10 +3,19 @@
 
 require_once(CONTROLLERS_ROOT . '/Route.php');
 require_once(CONTROLLERS_ROOT . '/PageController.php');
+require_once(CONTROLLERS_ROOT . '/ContactMailController.php');
 
 
 Route::set('home', function() {
 	PageController::home();
+});
+
+Route::set('contact', function() {
+	PageController::contact();
+});
+
+Route::set('send', function() {
+	ContactMailController::send($_POST);
 });
 
 Route::set('list', function() {

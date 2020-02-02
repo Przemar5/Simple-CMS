@@ -12,13 +12,11 @@ require_once('Validator.php');
 
 class PageController
 {
-	const APP_NAME = 'MyCMS';
-	
     public static function show($slug)
     {
 		$id = Page::idBySlug($slug);
 		$data['page'] = Page::select($id)->fetch(PDO::FETCH_ASSOC);
-		$data['label'] = self::APP_NAME . ' | ' . $data['page']['label'];
+		$data['label'] = APP_NAME . ' | ' . $data['page']['label'];
 
         require_once(VIEW['PAGE']);
     }
@@ -27,20 +25,30 @@ class PageController
     public static function home()
     {
         $data['pages'] = Page::all()->fetchAll(PDO::FETCH_ASSOC);
-		$data['label'] = self::APP_NAME . ' | Home';
+		$data['label'] = APP_NAME . ' | Home';
 		
 		foreach ($data['pages'] as $key => $value) {
 			$data['pages'][$key]['url_show'] = BASE_URL . '/' . $data['pages'][$key]['slug'];
 		}
 		
         require_once(VIEW['HOME']);
+		
+		unset($_SESSION['last_action']);
+    }
+	
+
+    public static function contact()
+    {
+		$data['label'] = APP_NAME . ' | Contact us';
+		
+        require_once(VIEW['CONTACT']);
     }
 	
 
     public static function list()
     {
         $data['pages'] = Page::all()->fetchAll(PDO::FETCH_ASSOC);
-		$data['label'] = self::APP_NAME . ' | Pages';
+		$data['label'] = APP_NAME . ' | Pages';
 		$data['url_add'] = BASE_URL . '/add';
 
 		foreach ($data['pages'] as $key => $value) {
@@ -59,7 +67,7 @@ class PageController
     {
 		$data['page'] = (!empty($_SESSION['submitted_data'])) ? $_SESSION['submitted_data'] : null;
 		$errors = (!empty($_SESSION['input_errors'])) ? $_SESSION['input_errors'] : null;
-		$data['label'] = self::APP_NAME . ' | Add page';
+		$data['label'] = APP_NAME . ' | Add page';
 		$data['url_store'] = BASE_URL . '/store';
 		
         require_once(VIEW['ADD_PAGE']);
@@ -109,7 +117,7 @@ class PageController
 		}
 		
 		$errors = (!empty($_SESSION['input_errors'])) ? $_SESSION['input_errors'] : null;
-		$data['label'] = self::APP_NAME . ' | Edit ' . $data['page']['label'];
+		$data['label'] = APP_NAME . ' | Edit ' . $data['page']['label'];
 		$data['url_update'] = BASE_URL . '/' . $data['page']['slug'] . '/update';
 		
         require_once(VIEW['EDIT_PAGE']);
