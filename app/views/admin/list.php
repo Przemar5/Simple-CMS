@@ -2,7 +2,7 @@
    
 	<?php include_once(ACTION_FEEDBACK); ?>
     
-    <?php if(empty($data['pages'])): ?>
+    <?php if(empty($pages )): ?>
         <p>No pages at the moment.</p>
     <?php else: ?>  
 		<table class="table table-striped" style="min-width: 400px">
@@ -15,7 +15,7 @@
 				</tr>
 			</thead>
 			<tbody>
-			<?php foreach($data['pages'] as $page): ?>
+			<?php foreach($pages as $page): ?>
 				<tr>
 					<td>
 						<?php echo $page['label']; ?>

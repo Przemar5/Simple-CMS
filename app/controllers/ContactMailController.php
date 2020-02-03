@@ -1,6 +1,12 @@
 <?php
 
+if (!isset($_SESSION))
+{
+	session_start();
+}
+
 require_once(CONTROLLERS_ROOT . '/Sanitizer.php');
+require_once('Validator.php');
 
 
 class ContactMailController
@@ -13,18 +19,54 @@ class ContactMailController
 	
 	public static function send($request)
 	{
-		list(self::$name,
-			self::$email, 
-			self::$subject, 
-			self::$message) = array_values($request);
+		print_r($request);
 		
-		self::prepareHeaders();
-		self::prepareSubject();
-		self::createView();
-		self::sendMail();
+		if (self::validate($request)) {			
+			list(self::$name,
+				self::$email, 
+				self::$subject, 
+				self::$message) = array_values($request);
+
+			self::prepareHeaders();
+			self::prepareSubject();
+			self::createView();
+			
+			if (self::sendMail()) {
+				$_SESSION['last_action']['success'] = 'Your email has been sent successfully.';
+			}
+			else {
+				$_SESSION['last_action']['error'] = 'Your email wasn\'t sent.';
+			}
+			
+			header('Location: ' . HOME);
+		}
+		else {
+			header('Location: ' . BASE_URL . '/contact');
+		}
 	}
 	
-	public function prepareHeaders()
+	private static function Validate($request)
+	{
+		$rules = [
+			'name' => ['required', 'between:2,80', /*'regex:[0-9a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ_ \-]'*/],
+			'email' => ['required', 'between:8,120'],
+			'subject' => ['required', 'between:1,120'],
+			'message' => ['required', 'min:3'],
+		];
+		$validator = new Validator;
+		
+		if ($validator->validate($request, $rules)) {
+			return true;
+		}
+		else {
+			$_SESSION['input_errors'] = $validator->errors;
+			$_SESSION['submitted_data'] = $request;
+			
+			return false;
+		}
+	}
+	
+	public static function prepareHeaders()
 	{
 		$eol = PHP_EOL;
 		$headers = "From: " . strip_tags(self::$name) . $eol;
@@ -62,13 +104,10 @@ class ContactMailController
 				 self::$subject, 
 				 self::$message,
 				 self::$headers)) {
-			
-			$_SESSION['last_action']['success'] = 'Your email has been sent successfully.';
+			return true;
 		}
 		else {
-			$_SESSION['last_action']['error'] = 'Your email wasn\'t sent.';
+			return false;
 		}
-		
-		header('Location: ' . HOME);
 	}
 }

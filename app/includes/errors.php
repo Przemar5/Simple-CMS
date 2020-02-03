@@ -1,9 +1,9 @@
 <?php 
-	function displayError(&$error)
+	function display_error($input)
 	{
-		if(isset($error)) {
-			echo '<small style="color:red; margin:0;">' . $error . '</small>';
-			unset($error);
+		if(isset($_SESSION['input_errors'][$input])) {
+			echo '<small style="color:red; margin:0;">' . $_SESSION['input_errors'][$input] . '</small>';
+			unset($_SESSION['input_errors'][$input]);
 		}
 	}
 ?>

@@ -1,6 +1,7 @@
 <?php
 
-if (!isset($_SESSION)) {
+if (!isset($_SESSION))
+{
 	session_start();
 }
 
@@ -42,19 +43,22 @@ class PageController
 		$data['label'] = APP_NAME . ' | Contact us';
 		
         require_once(VIEW['CONTACT']);
+		
+		unset($_SESSION['submitted_data']);
+		unset($_SESSION['input_errors']);
     }
 	
 
     public static function list()
     {
-        $data['pages'] = Page::all()->fetchAll(PDO::FETCH_ASSOC);
+        $pages = Page::all()->fetchAll(PDO::FETCH_ASSOC);
 		$data['label'] = APP_NAME . ' | Pages';
 		$data['url_add'] = BASE_URL . '/add';
 
-		foreach ($data['pages'] as $key => $value) {
-			$data['pages'][$key]['url_show'] = BASE_URL . '/' . $data['pages'][$key]['slug'];
-			$data['pages'][$key]['url_edit'] = BASE_URL . '/' . $data['pages'][$key]['slug'] . '/edit';
-			$data['pages'][$key]['url_delete'] = BASE_URL . '/' . $data['pages'][$key]['slug'] . '/delete';
+		foreach ($pages as $key => $value) {
+			$pages[$key]['url_show'] = BASE_URL . '/' . $pages[$key]['slug'];
+			$pages[$key]['url_edit'] = BASE_URL . '/' . $pages[$key]['slug'] . '/edit';
+			$pages[$key]['url_delete'] = BASE_URL . '/' . $pages[$key]['slug'] . '/delete';
 		}
 		
         require_once(VIEW['LIST_PAGES']);
@@ -65,8 +69,6 @@ class PageController
 
     public static function add()
     {
-		$data['page'] = (!empty($_SESSION['submitted_data'])) ? $_SESSION['submitted_data'] : null;
-		$errors = (!empty($_SESSION['input_errors'])) ? $_SESSION['input_errors'] : null;
 		$data['label'] = APP_NAME . ' | Add page';
 		$data['url_store'] = BASE_URL . '/store';
 		
@@ -109,16 +111,15 @@ class PageController
     public static function edit($slug)
     {
 		if (!empty($_SESSION['submitted_data'])) {
-			$data['page'] = $_SESSION['submitted_data'];
+			$page = $_SESSION['submitted_data'];
 		}
 		else {
 			$id = Page::idBySlug($slug);
-			$data['page'] = Page::select($id)->fetch(PDO::FETCH_ASSOC);
+			$page = Page::select($id)->fetch(PDO::FETCH_ASSOC);
 		}
 		
-		$errors = (!empty($_SESSION['input_errors'])) ? $_SESSION['input_errors'] : null;
-		$data['label'] = APP_NAME . ' | Edit ' . $data['page']['label'];
-		$data['url_update'] = BASE_URL . '/' . $data['page']['slug'] . '/update';
+		$data['label'] = APP_NAME . ' | Edit ' . $page['label'];
+		$data['url_update'] = BASE_URL . '/' . $page['slug'] . '/update';
 		
         require_once(VIEW['EDIT_PAGE']);
 		
@@ -152,7 +153,7 @@ class PageController
 			else {
 				$_SESSION['input_errors'] = $validator->errors;
 				$_SESSION['submitted_data'] = $request;
-				$slug = Page::slugById($request['id']);
+				$slug = Page::slugById($id);
 
 				header('Location: ' . BASE_URL . '/' . $slug . '/edit');
 			}

@@ -5,33 +5,33 @@
     <form action="<?php echo $data['url_store']; ?>" method="post" autocomplete="off">
         <label for="title">
             Title
-            <input type="text" name="title" id="title" value="<?php echo $data['page']['title']; ?>">
+            <input type="text" name="title" id="title" value="<?php submitted_data('title'); ?>">
         </label>
-       	<?php displayError($errors['title']); ?>
+       	<?php display_error('title'); ?>
 
         <br>
 
         <label for="label">
             Label
-            <input type="text" name="label" id="label" value="<?php echo $data['page']['label']; ?>">
+            <input type="text" name="label" id="label" value="<?php submitted_data('label'); ?>">
         </label>
-       	<?php displayError($errors['label']); ?>
+       	<?php display_error('label'); ?>
 
         <br>
 
         <label for="slug">
             Slug
-            <input type="text" name="slug" id="slug" value="<?php echo $data['page']['slug']; ?>">
+            <input type="text" name="slug" id="slug" value="<?php submitted_data('slug'); ?>">
         </label>
-       	<?php displayError($errors['slug']); ?>
+       	<?php display_error('slug'); ?>
 
         <br>
 
         <label for="body">
             Body
-            <textarea name="body" id="body"><?php echo $data['page']['body']; ?></textarea>
+            <textarea name="body" id="body"><?php submitted_data('body'); ?></textarea>
         </label>
-       	<?php displayError($errors['body']); ?>
+       	<?php display_error('body'); ?>
 
         <br>
         

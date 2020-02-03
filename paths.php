@@ -19,6 +19,7 @@ define('ADMIN_PANEL', BASE_URL . '/admin');
 define('CONNECTION', APP_ROOT . '/app/connect/Connection.php');
 define('AUTH', APP_ROOT . '/app/controllers/AuthController.php');
 define('ERRORS', APP_ROOT . '/app/includes/errors.php');
+define('FILL_INPUT', APP_ROOT . '/app/includes/submitted_data.php');
 
 define('HOME', BASE_URL);
 define('CONTACT', BASE_URL . '/contact');
