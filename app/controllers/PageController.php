@@ -49,6 +49,22 @@ class PageController
     }
 	
 
+    public static function search($phrase)
+    {
+		$data['label'] = APP_NAME . ' | Search';
+		
+		$search = new SearchController;
+		$pages = $search->search($phrase)->fetchAll(PDO::FETCH_ASSOC);
+		$foundInfo = $search->getFoundInfo();
+		
+		foreach ($pages as $key => $value) {
+			$pages[$key]['url_show'] = BASE_URL . '/' . $pages[$key]['slug'];
+		}
+		
+        require_once(VIEW['SEARCH']);
+    }
+	
+
     public static function list()
     {
         $pages = Page::all()->fetchAll(PDO::FETCH_ASSOC);

@@ -24,6 +24,7 @@ define('FILL_INPUT', APP_ROOT . '/app/includes/submitted_data.php');
 define('HOME', BASE_URL);
 define('CONTACT', BASE_URL . '/contact');
 define('SEND', BASE_URL . '/send');
+define('SEARCH', BASE_URL . '/search');
 
 define('STYLES', BASE_URL . '/css/style.css');
 
@@ -31,6 +32,7 @@ define('VIEW', [
 	'HOME'			=>	APP_ROOT . '/app/views/pages/home.php',
 	'CONTACT'		=>	APP_ROOT . '/app/views/pages/contact.php',
 	'PAGE'			=>	APP_ROOT . '/app/views/pages/page.php',
+	'SEARCH'		=>	APP_ROOT . '/app/views/pages/search.php',
 	'LIST_PAGES'	=>	APP_ROOT . '/app/views/admin/list.php',
 	'ADD_PAGE'		=>	APP_ROOT . '/app/views/admin/add.php',
 	'EDIT_PAGE'		=>	APP_ROOT . '/app/views/admin/edit.php',

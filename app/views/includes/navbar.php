@@ -13,8 +13,8 @@
     				</li>
     				<?php endforeach; ?>
     			</ul>
-    			<form action="<?php echo BASE_URL; ?>" class="navbar__search">
-    				<input type="search" name="search" class="navbar__search-text" placeholder="Search for...">
+    			<form action="<?php echo SEARCH; ?>" class="navbar__search">
+    				<input type="search" name="phrase" class="navbar__search-text" placeholder="Search for...">
     				<input type="submit" class="navbar__search-btn" value="Search">
     			</form>
     		</div>

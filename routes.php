@@ -4,7 +4,10 @@
 require_once(CONTROLLERS_ROOT . '/Route.php');
 require_once(CONTROLLERS_ROOT . '/PageController.php');
 require_once(CONTROLLERS_ROOT . '/ContactMailController.php');
+require_once(CONTROLLERS_ROOT . '/SearchController.php');
 
+//print_r($_GET);
+//die();
 
 Route::set('home', function() {
 	PageController::home();
@@ -12,6 +15,10 @@ Route::set('home', function() {
 
 Route::set('contact', function() {
 	PageController::contact();
+});
+
+Route::set('search', function() {
+	PageController::search($_GET['phrase']);
 });
 
 Route::set('send', function() {

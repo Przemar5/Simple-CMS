@@ -37,6 +37,33 @@ class Page
 		
 		return $stmt->fetch(PDO::FETCH_OBJ)->id;
 	}
+	
+	
+	public static function query($sql, $params)
+	{
+		$stmt = Connection::getInstance()->prepare($sql);
+		$stmt->execute($params);
+		
+		return $stmt;
+	}
+	
+	
+	public static function search($keywords = [])
+	{
+		$sql = "SELECT *
+				FROM pages
+				WHERE (title
+				LIKE :phrase
+				OR body
+				LIKE :phrase)
+				ORDER BY created_at DESC";
+		$keywords = "%".$keywords."%";
+		$param = ["phrase" => $keywords];
+		$stmt = Connection::getInstance()->prepare($sql);
+		$stmt->execute($param);
+		
+		return $stmt;
+	}
 
 	
     public static function all()

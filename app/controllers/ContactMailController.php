@@ -78,12 +78,12 @@ class ContactMailController
 		self::$headers = $headers;
 	}
 	
-	private static function prepareSubject()
+	public static function prepareSubject()
 	{
 		self::$subject = APP_NAME . ' - ' . self::$subject;
 	}
 	
-	private static function insertData($buffer)
+	public static function insertData($buffer)
 	{
 		$buffer = preg_replace('/\$subject/', self::$subject, $buffer, -1);
 		$buffer = preg_replace('/\$message/', self::$message, $buffer, -1);
@@ -95,6 +95,7 @@ class ContactMailController
 	{
 		$email = file_get_contents(VIEW['CONTACT_MAIL']);
 		$email = self::insertData($email);
+		
 		self::$message = $email;
 	}
 	
