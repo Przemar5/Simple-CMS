@@ -27,6 +27,26 @@
 
         <br>
 
+        <label for="navbar_place">
+            Display on navbar
+        	<select name="navbar_place" id="navbar_place">
+        		<option value="">
+        			None
+        		</option>
+        		<option value="0">
+        			Main
+        		</option>
+        		<?php foreach ($navbarPages as $navItem): ?>
+        			<option value="<?php echo $navItem['id']; ?>">
+        				<?php echo $navItem['label']; ?>
+        			</option>
+        		<?php endforeach; ?>
+        	</select>
+        </label>
+       	<?php  ?>
+
+        <br>
+
         <label for="body">
             Body
             <textarea name="body" id="body"><?php echo $page['body']; ?></textarea>

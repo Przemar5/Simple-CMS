@@ -44,6 +44,7 @@
 		</table>
     <?php endif; ?>
     
-    <a href="<?php echo $data['url_add']; ?>" class="btn btn-block btn-primary">Add new page</a>
+    <a href="<?php echo $data['url_add']; ?>">Add new page</a>
+    <a href="<?php echo NAVBAR_MANAGER; ?>">Manage navbar</a>
     
 <?php require_once(FOOTER); ?>

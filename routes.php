@@ -3,6 +3,7 @@
 
 require_once(CONTROLLERS_ROOT . '/Route.php');
 require_once(CONTROLLERS_ROOT . '/PageController.php');
+require_once(CONTROLLERS_ROOT . '/NavbarController.php');
 require_once(CONTROLLERS_ROOT . '/ContactMailController.php');
 require_once(CONTROLLERS_ROOT . '/SearchController.php');
 
@@ -27,6 +28,14 @@ Route::set('send', function() {
 
 Route::set('list', function() {
 	PageController::list();
+});
+
+Route::set('navbar', function() {
+	PageController::navbarManager();
+});
+
+Route::set('navbar/submenus', function() {
+	NavbarController::addSubmenu($_POST);
 });
 
 Route::set('add', function() {

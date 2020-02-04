@@ -32,6 +32,10 @@ class PageController
 			$data['pages'][$key]['url_show'] = BASE_URL . '/' . $data['pages'][$key]['slug'];
 		}
 		
+		$navbar = NavbarController::getInstance();
+		$navbar::getItems();
+		$navbar::view();
+		
         require_once(VIEW['HOME']);
 		
 		unset($_SESSION['last_action']);
@@ -77,7 +81,38 @@ class PageController
 			$pages[$key]['url_delete'] = BASE_URL . '/' . $pages[$key]['slug'] . '/delete';
 		}
 		
+		$navbar = NavbarController::getInstance();
+		$navbar::getItems();
+		$navbar::getCategories();
+		$navbar::view();
+		
         require_once(VIEW['LIST_PAGES']);
+		
+		unset($_SESSION['last_action']);
+    }
+	
+
+    public static function navbarManager()
+    {
+        $pages = Page::all()->fetchAll(PDO::FETCH_ASSOC);
+		$data['label'] = APP_NAME . ' | Pages';
+		$data['url_add'] = BASE_URL . '/add';
+
+		foreach ($pages as $key => $value) {
+			$pages[$key]['url_show'] = BASE_URL . '/' . $pages[$key]['slug'];
+			$pages[$key]['url_edit'] = BASE_URL . '/' . $pages[$key]['slug'] . '/edit';
+			$pages[$key]['url_delete'] = BASE_URL . '/' . $pages[$key]['slug'] . '/delete';
+		}
+		
+		$navbar = NavbarController::getInstance();
+		$items = $navbar::getItems();
+		$submenus = $navbar::getSubmenus();
+		$navbar::view();
+		
+		$data['url_submenu_add'] = NAVBAR_MANAGER . '/submenus/store';
+		$data['url_item_add'] = NAVBAR_MANAGER . '/items/store';
+		
+        require_once(VIEW['NAVBAR_MANAGER']);
 		
 		unset($_SESSION['last_action']);
     }
@@ -137,6 +172,8 @@ class PageController
 		$data['label'] = APP_NAME . ' | Edit ' . $page['label'];
 		$data['url_update'] = BASE_URL . '/' . $page['slug'] . '/update';
 		
+		$navbarPages = Page::all();
+		
         require_once(VIEW['EDIT_PAGE']);
 		
 		unset($_SESSION['submitted_data']);
@@ -154,6 +191,7 @@ class PageController
 				'title' => ['required', 'between:7,255', 'regex:[a-zA-Z0-9 _\/\*\+\-\#]', 'unique:pages,'.$request['id']],
 				'label' => ['required', 'between:7,70', 'regex:[a-zA-Z0-9 _\/\*\+\-\#]', 'unique:pages,'.$request['id']],
 				'slug' => ['required', 'between:3,255', 'regex:[a-zA-Z0-9-]', 'unique:pages,'.$request['id']],
+				'navbar_place' => ['numeric', 'max:7'],
 				'body' => ['required', 'min:3', /*'regex:[a-zA-Z0-9 _\/\*\+\-\#\n\r\<\>\,\.\?\:\;\(\)\[\]\"\'\^\%\@\!]'*/],
 			];
 
