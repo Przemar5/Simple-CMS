@@ -83,7 +83,7 @@ class PageController
 		
 		$navbar = NavbarController::getInstance();
 		$navbar::getItems();
-		$navbar::getCategories();
+		$navbar::getSubmenus();
 		$navbar::view();
 		
         require_once(VIEW['LIST_PAGES']);
@@ -104,10 +104,8 @@ class PageController
 			$pages[$key]['url_delete'] = BASE_URL . '/' . $pages[$key]['slug'] . '/delete';
 		}
 		
-		$navbar = NavbarController::getInstance();
-		$items = $navbar::getItems();
-		$submenus = $navbar::getSubmenus();
-		$navbar::view();
+		NavbarController::navbar();
+		$submenus = NavbarController::getSubmenus();
 		
 		$data['url_submenu_add'] = NAVBAR_MANAGER . '/submenus/store';
 		$data['url_item_add'] = NAVBAR_MANAGER . '/items/store';

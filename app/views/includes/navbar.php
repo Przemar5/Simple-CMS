@@ -1,26 +1,4 @@
-    	<!--
-    	<nav role="navigation">
-    		<div class="navbar">
-    			<a href="<?php //echo HOME; ?>" class="navbar__brand">
-    				<?php //echo APP_NAME; ?>
-    			</a>
-    			
-    			<ul class="navbar__list">
-    				<?php //foreach(NAVBAR_ITEMS as $name => $url): ?>
-    				<li class="navbar__item">
-    					<a href="<?php //echo $url; ?>" class="navbar__link">
-    						<?php //echo $name; ?>
-    					</a>
-    				</li>
-    				<?php //endforeach; ?>
-    			</ul>
-    			<form action="<?php //echo SEARCH; ?>" class="navbar__search">
-    				<input type="search" name="phrase" class="navbar__search-text" placeholder="Search for...">
-    				<input type="submit" class="navbar__search-btn" value="Search">
-    			</form>
-    		</div>
-    	</nav>
-   	    -->
+    	
     	<nav role="navigation">
     		<div class="navbar">
     			<a href="<?php echo HOME; ?>" class="navbar__brand">
@@ -28,34 +6,37 @@
     			</a>
     			
 				<ul class="navbar__list">
+   				
     				<?php if (count($navbarItems)): ?>
-						<?php foreach($navbarItems as $navItem): ?>
-						<li class="navbar__item">
-							<a href="<?php echo $navItem['slug']; ?>" class="navbar__link">
-								<?php echo $navItem['label']; ?>
-							</a>
+						<?php foreach($navbarItems as $item): ?>
+						<li class="navbar__item navbar__item-submenu">
+						
+							<?php if (isset($item['children'])): ?>
+								<label for="submenu-<?php echo $item['id']; ?>" class="navbar__submenu-label">
+									<?php echo $item['label']; ?>
+								</label>
+								
+								<input type="checkbox" id="submenu-<?php echo $item['id']; ?>" class="navbar__submenu-toggler">
+								
+								<ul class="navbar__submenu-list">
+									<?php foreach ($item['children'] as $submenuItem): ?>
+									<li class="navbar__submenu-item">
+										<a href="<?php echo $submenuItem['slug']; ?>">
+											<?php echo $submenuItem['label']; ?>
+										</a>
+									</li>
+									<?php endforeach; ?>
+								</ul>
+							<?php else: ?>
+								<a href="<?php echo $item['slug']; ?>">
+									<?php echo $item['label']; ?>
+								</a>
+							<?php endif; ?>
+							
 						</li>
 						<?php endforeach; ?>
     				<?php endif; ?>
     				
-    				<?php if (count($navbarSubmenus)): ?>
-						<?php foreach($navbarSubmenus as $submenu): ?>
-						<li class="navbar__item navbar__item-submenu">
-							<label for="submenu-<?php echo $submenu['id']; ?>" class="navbar__submenu-label">
-								<?php echo $submenu['label']; ?>
-							</label>
-							<input type="checkbox" id="submenu-<?php echo $submenu['id']; ?>" class="navbar__submenu-toggler">
-							<ul class="navbar__submenu-list">
-								<li class="navbar__submenu-item">
-									Item 1
-								</li>
-								<li class="navbar__submenu-item">
-									Item 2
-								</li>
-							</ul>
-						</li>
-						<?php endforeach; ?>
-    				<?php endif; ?>
 				</ul>
     			
     			<form action="<?php echo SEARCH; ?>" class="navbar__search">
@@ -137,11 +118,17 @@
 	display: none;
 }
 	
+.navbar__submenu-item {
+	display: blook;
+	width: 100%;
+	height: 5rem;
+}
+	
 .navbar__submenu-toggler:checked + .navbar__submenu-list {
 	display: block;
 	width: 100%;
 	height: 100px;
-	background-color: red;
+	background-color: #333;
 	position: absolute;
 	top: 100%;
 	left: 0px;

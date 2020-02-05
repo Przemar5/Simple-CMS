@@ -3,7 +3,7 @@
 require_once(CONNECTION);
 
 
-class Navbar
+class Submenu_item
 {
 	public static function items()
     {
@@ -41,38 +41,25 @@ class Navbar
 	}
 	
 	
-	public static function baseLevel()
-	{
-		$sql = 'SELECT * 
-				FROM navigation_items 
-				WHERE parent_id IS NULL
-				ORDER BY item_index ASC';
-		$stmt = Connection::getInstance()->prepare($sql);
-		$stmt->execute();
-		
-		return $stmt;
-	}
-	
-	
-	public static function wholeLevel($parentId)
-	{
-		$sql = 'SELECT * 
-				FROM navigation_items 
-				WHERE parent_id = :parent_id
-				ORDER BY item_index ASC';
-		$params = ['parent_id' => $parentId];
-		$stmt = Connection::getInstance()->prepare($sql);
-		$stmt->execute($params);
-		
-		return $stmt;
-	}
-	
-	
 	public static function select($id)
 	{
 		$sql = 'SELECT *
 				FROM navigation_items
 				WHERE id = :id';
+		$param = ['id' => $id];
+		$stmt = Connection::getInstance()->prepare($sql);
+		$stmt->execute($param);
+		
+		return $stmt;
+	}
+	
+	
+	public static function selectPages($id)
+	{
+		$sql = 'SELECT pages.id, pages.title, pages.label, pages.slug, submenu_item.submenu_id 
+				FROM submenu_item, pages 
+				WHERE submenu_item.page_id = pages.id
+					AND submenu_item.submenu_id = :id';
 		$param = ['id' => $id];
 		$stmt = Connection::getInstance()->prepare($sql);
 		$stmt->execute($param);
@@ -97,8 +84,8 @@ class Navbar
 	public static function insertSubmenu($request)
 	{
 		$sql = 'INSERT INTO navigation_items 
-					(submenu_id, item_index parent_id) 
-				VALUES (:submenu_id, :item_index, :parent_id)';
+					(submenu_id, item_index) 
+				VALUES (:submenu_id, :item_index)';
 		$stmt = Connection::getInstance()->prepare($sql);
 		$stmt->execute($request);
 		$rows = $stmt->rowCount();
@@ -134,38 +121,5 @@ class Navbar
 		$rows = $stmt->rowCount();
 		
 		return $rows;
-	}
-	
-	
-	public static function increaseItemIndexes($submenu, $itemIndex)
-	{
-		$sql = 'UPDATE navigation_items 
-				SET item_index = item_index+1 
-				WHERE submenu_id = :submenu_id
-				AND item_index >= :item_index';
-		$param = ['item_index' => $itemIndex];
-
-        $stmt = Connection::getInstance()->prepare($sql);
-		$stmt->execute($param);
-		$rows = $stmt->rowCount();
-	}
-	
-	
-	public static function decreaseItemIndexes($submenu, $currentIndex)
-	{
-		$sql = 'UPDATE navigation_items 
-				SET item_index = item_index-1 
-				WHERE submenu_id = :submenu_id
-				AND item_index >= :item_index';
-		$param = ['item_index' => $itemIndex];
-
-        $stmt = Connection::getInstance()->prepare($sql);
-		$stmt->execute($param);
-		$rows = $stmt->rowCount();
-	}
-	
-	public static function normalizeIndexes()
-	{
-		
 	}
 }

@@ -1,58 +1,18 @@
 <?php
 
-require_once(MODEL);
+require_once(CONNECTION);
 
 
-class Page extends Model
+class Model
 {
-	protected static $table = 'pages';
+	protected static $table;
 	
-	public function __construct()
+	
+	
+	public static function query($sql, $params)
 	{
-		//Connection::getInstance() = Connection::getInstance();
-		
-	}
-	
-	
-	public static function slugById($id)
-	{
-		$sql = 'SELECT slug
-				FROM pages
-				WHERE id = :id';
-		$param = ['id' => $id];
 		$stmt = Connection::getInstance()->prepare($sql);
-		$stmt->execute($param);
-		
-		return $stmt->fetch(PDO::FETCH_OBJ)->slug;
-	}
-	
-	
-	public static function idBySlug($slug)
-	{
-		$sql = 'SELECT id
-				FROM pages
-				WHERE slug = :slug';
-		$param = ['slug' => $slug];
-		$stmt = Connection::getInstance()->prepare($sql);
-		$stmt->execute($param);
-		
-		return $stmt->fetch(PDO::FETCH_OBJ)->id;
-	}
-	
-	
-	public static function search($keywords = [])
-	{
-		$sql = "SELECT *
-				FROM pages
-				WHERE (title
-				LIKE :phrase
-				OR body
-				LIKE :phrase)
-				ORDER BY created_at DESC";
-		$keywords = "%".$keywords."%";
-		$param = ["phrase" => $keywords];
-		$stmt = Connection::getInstance()->prepare($sql);
-		$stmt->execute($param);
+		$stmt->execute($params);
 		
 		return $stmt;
 	}
@@ -61,23 +21,10 @@ class Page extends Model
     public static function all()
     {
         $sql = 'SELECT id, label, title, slug 
-				FROM pages 
+				FROM '.self::$table.' 
 				ORDER BY created_at DESC';
 		$stmt = Connection::getInstance()->prepare($sql);
 		$stmt->execute();
-		
-		return $stmt;
-    }
-
-	
-    public static function selectWithoutBody($id)
-    {
-        $sql = 'SELECT id, label, title, slug 
-				FROM pages 
-				WHERE id = :id';
-		$param = ['id' => $id];
-		$stmt = Connection::getInstance()->prepare($sql);
-		$stmt->execute($param);
 		
 		return $stmt;
     }
@@ -86,8 +33,8 @@ class Page extends Model
 	public static function select($id)
 	{
 		$sql = 'SELECT *
-				FROM pages
-				WHERE id = :id';
+				FROM '.self::$table.
+				'WHERE id = :id';
 		$param = ['id' => $id];
 		$stmt = Connection::getInstance()->prepare($sql);
 		$stmt->execute($param);

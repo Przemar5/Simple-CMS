@@ -7,6 +7,7 @@ define('APP_ROOT', __DIR__);
 define('NAMES', APP_ROOT . '/names.php');
 
 define('MODELS_ROOT', APP_ROOT . '/app/models');
+define('MODEL', APP_ROOT . '/app/models/Model.php');
 define('VIEW_ROOT', APP_ROOT . '/app/views');
 define('NAVBAR', VIEW_ROOT . '/includes/navbar.php');
 define('ACTION_FEEDBACK', VIEW_ROOT . '/includes/action_feedback.php');

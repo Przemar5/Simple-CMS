@@ -13,9 +13,25 @@
 
         <br>
 
-        <label for="submenu_id">
+        <label for="parent_id">
             In submenu
-        	<select name="submenu_id" id="submenu_id">
+        	<select name="parent_id" id="parent_id">
+        		<option value="">
+        			None
+        		</option>
+        		<?php foreach ($submenus as $submenu): ?>
+        			<option value="<?php echo $submenu['id']; ?>">
+        				<?php echo $submenu['label']; ?>
+        			</option>
+        		<?php endforeach; ?>
+        	</select>
+        </label>
+
+        <br>
+
+        <label for="item_index">
+            Item index
+        	<select name="item_index" id="item_index">
         		<option value="">
         			None
         		</option>
