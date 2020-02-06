@@ -13,7 +13,7 @@ class NavbarController
 	public static $items = null;
 	public static $submenus = null;
 	public static $firstLayer = null;
-	public static $navigationTree = null;
+	public static $navbarItems = null;
 	
 	public static function getInstance()
 	{
@@ -29,187 +29,126 @@ class NavbarController
 		
 	}
 	
+	public static function getItems()
+	{
+		
+	}
+	
 	public static function getAllItems()
 	{
-		if (!self::$firstLayer) {
-			self::$firstLayer = Navbar::all()->fetchAll(PDO::FETCH_ASSOC);
-		}
+		return Navbar::all()->fetchAll(PDO::FETCH_ASSOC);
 	}
 	
 	public static function getLinks()
 	{
-		if (!self::$items) {
-			self::$items = Navbar::items()->fetchAll(PDO::FETCH_ASSOC);
-		}
-		
-		return self::$items;
+		return Navbar::items()->fetchAll(PDO::FETCH_ASSOC);
 	}
 	
 	public static function getSubmenus()
 	{
-		if (!self::$submenus) {
-			self::$submenus = Navbar::submenus()->fetchAll(PDO::FETCH_ASSOC);
-		}
-		
-		return self::$submenus;
+		return Navbar::submenus()->fetchAll(PDO::FETCH_ASSOC);
 	}
 	
-	public static function view()
+	public static function convertToReadable($items)
 	{
+		$result = [];
 		
-		$navbarItems = Navbar::baseLevel()->fetchAll(PDO::FETCH_ASSOC);
-		$items = [];
-		
-		
-		for ($i = 0; $i < sizeof($navbarItems); $i++) {
-			$item = $navbarItems[$i];
-			
-			if (!empty($item) && $item != null) {
-				if (!empty($item['page_id'])) {
-					array_push($items, Page::selectWithoutBody($item['page_id'])->fetch(PDO::FETCH_ASSOC));
+		foreach ($items as $item) {
+			if (self::isNotEmpty($item)) {
+				if (self::isLink($item)) {
+					array_push($result, self::processLinkData($item));
 				}
-				else if (!empty($item['submenu_id'])) {
-					array_push($items, Submenu::select($item['submenu_id'])->fetch(PDO::FETCH_ASSOC));
-					
-					$itemsTemp[$i]['children'] = Navbar::wholeLevel($item['submenu_id'])->fetchAll(PDO::FETCH_ASSOC);
-					
-					
-					for ($j = 0; $j < sizeof($itemsTemp[$i]['children']); $j++) {
-						if (!empty($itemsTemp[$i]['children'][$j]) && $itemsTemp[$i]['children'][$j] != null) {
-							
-							if (!empty($itemsTemp[$i]['children'][$j]['page_id'])) {
-								$items[$i]['children'][$j] = Page::selectWithoutBody($itemsTemp[$i]['children'][$j]['page_id'])->fetch(PDO::FETCH_ASSOC);
-							}
-							else if (!empty($itemsTemp[$i]['children'][$j]['submenu_id'])) {
-//								$items[$i]['children'][$j]['children'] = Submenu_item::selectPages($item['submenu_id'])->fetchAll(PDO::FETCH_ASSOC);
-								$itemsTemp[$i]['children'][$j]['children'] = Navbar::wholeLevel($itemsTemp[$i]['children'][$j]['submenu_id'])->fetchAll(PDO::FETCH_ASSOC);
-								
-								$items[$i]['children'][$j] = Submenu::select($itemsTemp[$i]['children'][$j]['submenu_id'])->fetch(PDO::FETCH_ASSOC);
-
-							}
-						}
-					}
+				else if (self::isSubmenu($item)) {
+					array_push($result, self::processSubmenuData($item));
 				}
 			}
 		}
 		
+		return $result;
+	}
+	
+	public static function prepareAsTable($items)
+	{
+		$result = [];
 		
-		//$items = self::start();
+		for ($i = 0; $i < sizeof($items); $i++) {
+			if (self::isNotEmpty($items[$i])) {
+				if (self::isLink($items[$i])) {
+					array_push($result, self::processLinkData($items[$i]));
+					$result[$i]['type'] = 'Link';
+				}
+				else if (self::isSubmenu($items[$i])) {
+					array_push($result, self::processSubmenuData($items[$i]));
+					$result[$i]['type'] = 'Submenu';
+				}
+				
+				if (self::isNotEmpty($items[$i]['parent_id'])) {
+					$result[$i]['parent_id'] = (Submenu::select($items[$i]['parent_id'])->fetch(PDO::FETCH_ASSOC))['label'];
+				}
+				else {
+					$result[$i]['parent_id'] = 'None';
+				}
+				
+				$result[$i]['item_index'] = $items[$i]['item_index'];
+			}
+		}
 		
-		echo "<pre>";
-		$navbarItems = $items;
-		
-		print_r($navbarItems);
-		
-		self::start();
-		
-		die();
+		return $result;
+	}
+	
+	public static function view()
+	{
+		if (!self::$navbarItems) {
+			self::$navbarItems = self::getLevelStmt();
+			self::$navbarItems = self::getNavbarItems(self::$navbarItems);
+		}
+		$navbarItems = self::$navbarItems;
 		
 		require_once(NAVBAR);
+	}
+	
+	
+	public static function getNavbarItems($stmt)
+	{
+		$result = [];
+		
+		while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+			if (self::isLink($row)) {
+				$row = self::processLinkData($row);
+			}
+			else if (self::isSubmenu($row)) {
+				$newStmt = self::getLevelStmt($row['submenu_id']);
+				$row = self::processSubmenuData($row);
+				$row['children'] = self::getNavbarItems($newStmt);
+			}
+			
+			array_push($result, $row);
+		}
+		
+		return $result;
 	}
 	
 	
 	public static function getLevelData($submenu_id = null)
 	{
 		if (!$submenu_id) {
-			return Navbar::baseLevel();//->fetchAll(PDO::FETCH_ASSOC);
+			return Navbar::baseLevel()->fetchAll(PDO::FETCH_ASSOC);
 		}
 		else {
-			return Navbar::wholeLevel($submenu_id);//->fetchAll(PDO::FETCH_ASSOC);
+			return Navbar::wholeLevel($submenu_id)->fetchAll(PDO::FETCH_ASSOC);
 		}
 	}
 	
 	
-	public static function start()
+	public static function getLevelStmt($submenu_id = null)
 	{
-		self::$navigationTree = null;
-		
-		$stmt = Navbar::baseLevel();
-		
-//		return self::processData($navbarItems);
-		$result = [];
-		
-		$items = self::processData2($stmt->fetchAll(PDO::FETCH_ASSOC));
-		
-		echo "<pre>";
-		print_r($items);
-		
-		/*
-		while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-			array_push($result, self::processData3($row));
+		if (!$submenu_id) {
+			return Navbar::baseLevel();
 		}
-		*/
-	}
-	
-	
-	public static function processData3($item)
-	{
-		echo "<pre>";
-		print_r($item);
-		
-		if (self::isNotEmpty($item)) {
-			if (self::isLink($item)) {
-				return self::processLinkData($item);
-			}
-			else if (self::isSubmenu($item)) {
-				$item = self::processSubmenuData($item);
-
-				$item['children'] = [];
-				$stmt = self::getLevelData($item['submenu_id']);
-				
-				while ($submenu = $stmt->fetch(PDO::FETCH_ASSOC)) {
-					array_push($item['children'], self::processData3($submenu));
-				}
-			}
+		else {
+			return Navbar::wholeLevel($submenu_id);
 		}
-		
-		return $item;
 	}
-	
-	
-	public static function processData(&$items, $level = 0)
-	{
-		for ($i = 0; $i < sizeof($items); $i++) {
-			if (!empty($items[$i]) && $items[$i] != null) {
-				if (!empty($items[$i]['page_id'])) {
-					//echo "Item: $i, page_id = ".$items[$i]["page_id"]."<br><br>";
-					array_push($items, Page::selectWithoutBody($items[$i]['page_id'])->fetch(PDO::FETCH_ASSOC));
-				}
-				else if (!empty($items[$i]['submenu_id'])) {
-					array_push($items, Submenu::select($items[$i]['submenu_id'])->fetch(PDO::FETCH_ASSOC));
-					
-					$itemsTemp[$i]['children'] = Navbar::wholeLevel($items[$i]['submenu_id'])->fetchAll(PDO::FETCH_ASSOC);
-					
-					$items[$i]['children'] = self::processData($itemsTemp[$i]['children']);
-					//self::processData($itemsTemp[$i]['children']);
-				}
-			}
-		}
-		return $items;
-	}
-	
-	
-	public static function processData2($items)
-	{
-		for ($i = 0; $i < sizeof($items); $i++) {
-			if (self::isNotEmpty($items[$i])) {
-				if (self::isLink($items[$i])) {
-					array_push($items, self::processLinkData($items[$i]));
-				}
-				else if (self::isSubmenu($items[$i])) {
-					array_push($items, self::processSubmenuData($items[$i]));
-					
-					$itemsTmp[$i]['children'] = self::getLevelData($items[$i]['submenu_id']);
-					
-					$items[$i]['children'] = self::processData2($itemsTmp[$i]['children']);
-				}
-			}
-		}
-		
-		return $items;
-	}
-	
-	
 	
 	
 	public static function isNotEmpty($item)
@@ -242,41 +181,6 @@ class NavbarController
 	}
 	
 	
-	
-	
-	public static function process(&$items = null)
-	{
-		for ($i = 0; $i < sizeof($navbarItems); $i++) {
-			if (self::isNotEmpty($item)) {
-				if (self::isLink($item)) {
-					array_push($items, self::processLinkData($item));
-				}
-				else if (self::isSubmenu($item)) {
-					array_push($items, self::processSubmenuData($item));
-					
-					$items['children'] = self::process($items);
-				}
-			}
-			
-			if (!empty($item) && $item != null) {
-				if (!empty($item['page_id'])) {
-					array_push($items, Page::selectWithoutBody($item['page_id'])->fetch(PDO::FETCH_ASSOC));
-				}
-				else if (!empty($item['submenu_id'])) {
-					array_push($items, Submenu::select($item['submenu_id'])->fetch(PDO::FETCH_ASSOC));
-					
-//					$items[$i]['children'] = Submenu_item::selectPages($item['submenu_id'])->fetchAll(PDO::FETCH_ASSOC);
-					$itemsTemp[$i]['children'] = Navbar::wholeLevel($item['submenu_id'])->fetchAll(PDO::FETCH_ASSOC);
-					
-					
-				}
-			}
-		}
-		
-		return $items;
-	}
-	
-	
 	public static function navbar()
 	{
 		self::getAllItems();
@@ -288,11 +192,13 @@ class NavbarController
 		
 	}
 	
+	
 	public static function addSubmenu($request)
 	{
 		$parent_id = $request['parent_id'];
 		$rules = [
 			'label' => ['required', 'between:3,55'],
+			'item_index' => ['required', 'between:1,3', 'numeric']
 		];
 		$validator = new Validator;
 		
@@ -300,37 +206,48 @@ class NavbarController
 			if ($validator->validate($request, $rules)) {
 				$param = ['label' => $request['label']];
 				
-				echo "<pre>";
-				print_r($request);
-				die();
+				$level = Navbar::wholeLevel($request['parent_id'])->fetchAll(PDO::FETCH_ASSOC);
+				
+				if (self::normalizeItemIndexes($level) && empty($request['item_index'])) {
+					$request['item_index'] = sizeof($level) + 1;
+				}
 				
 				if (Submenu::insert($param) === 1) {
 					// I already have no idea if using this variable is good idea.
 					// I wonder how would it work submitting many forms at the same time
 					$lastInsertId = Submenu::lastInsertId();
-					
 					$params = [
 						'submenu_id' => $lastInsertId,
-						'item_index' => 0,
-						'parent_id' => 'parent_id'
+						'item_index' => $request['item_index'],
+						'parent_id' => $request['parent_id']
 					];
 					
 					if (Navbar::insertSubmenu($params)) {
-						echo 'Inserted';
-					}
-					else {
-						echo 'Not inserted';
+						$_SESSION['last_action']['success'] = 'New submenu was created successfully.';
+						
+						header('Location: ' . NAVBAR_MANAGER);
 					}
 				}
 			}
-			
-            $_SESSION['last_action']['success'] = 'New page was created successfully.';
-		}
-		else {
-			$_SESSION['last_action']['error'] = 'Error: new page wasn\'t created.';
 		}
 		
+		$_SESSION['last_action']['error'] = 'Error: new submenu wasn\'t created.';
+		
 		header('Location: ' . NAVBAR_MANAGER);
+	}
+	
+	
+	public static function normalizeItemIndexes($submenu)
+	{
+		$updateList = [];
+		
+		for ($i = 0; $i < sizeof($submenu); $i++) {
+			if ($submenu[$i]['item_index'] != $i + 1) {
+				$updateList[$submenu[$i]['id']] = $i + 1;
+			}
+		}
+		
+		return sizeof($updateList) === Navbar::updateIndexes($updateList);
 	}
 	
 	public static function getChildren()

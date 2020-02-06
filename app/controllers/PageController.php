@@ -94,19 +94,13 @@ class PageController
 
     public static function navbarManager()
     {
-        $pages = Page::all()->fetchAll(PDO::FETCH_ASSOC);
 		$data['label'] = APP_NAME . ' | Pages';
 		$data['url_add'] = BASE_URL . '/add';
-
-		foreach ($pages as $key => $value) {
-			$pages[$key]['url_show'] = BASE_URL . '/' . $pages[$key]['slug'];
-			$pages[$key]['url_edit'] = BASE_URL . '/' . $pages[$key]['slug'] . '/edit';
-			$pages[$key]['url_delete'] = BASE_URL . '/' . $pages[$key]['slug'] . '/delete';
-		}
 		
 		NavbarController::navbar();
 		$submenus = NavbarController::getSubmenus();
-		
+		$navbarItems = NavbarController::getAllItems();
+		$navbarItems = NavbarController::prepareAsTable($navbarItems);
 		$data['url_submenu_add'] = NAVBAR_MANAGER . '/submenus/store';
 		$data['url_item_add'] = NAVBAR_MANAGER . '/items/store';
 		

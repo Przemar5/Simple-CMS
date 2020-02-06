@@ -33,7 +33,7 @@ class Navbar
 	{
 		$sql = 'SELECT * 
 				FROM navigation_items 
-				ORDER BY item_index ASC';
+				ORDER BY id DESC';
 		$stmt = Connection::getInstance()->prepare($sql);
 		$stmt->execute();
 		
@@ -96,9 +96,9 @@ class Navbar
 	
 	public static function insertSubmenu($request)
 	{
-		$sql = 'INSERT INTO navigation_items 
-					(submenu_id, item_index parent_id) 
-				VALUES (:submenu_id, :item_index, :parent_id)';
+		$sql = "INSERT INTO navigation_items 
+					(submenu_id, item_index, parent_id) 
+				VALUES (:submenu_id, :item_index, :parent_id)";
 		$stmt = Connection::getInstance()->prepare($sql);
 		$stmt->execute($request);
 		$rows = $stmt->rowCount();
@@ -167,5 +167,44 @@ class Navbar
 	public static function normalizeIndexes()
 	{
 		
+	}
+	
+	public static function updateIndexes($params)
+	{
+		if (sizeof($params) === 1) {
+			$key = array_key_first($params);
+			$value = $params[$key];
+			$sql = "UPDATE navigation_items
+					SET item_index = $value
+					WHERE id = $key";
+		}
+		else {
+			$sql = "UPDATE navigation_items
+					SET item_index = (CASE";
+			$rows = 1;
+			
+			foreach ($params as $key => $value) {
+				$sql .= " WHEN id = $key THEN $value";
+				$rows++;
+			}
+			$sql .= " END) WHERE id IN (";
+
+			foreach ($params as $key => $value) {
+				$rows--;
+				$sql .= "$key";
+				
+				if ($rows > 1) {
+					$sql .= ", ";
+				}
+			}
+
+			$sql .= ")";
+		}
+		
+		$stmt = Connection::getInstance()->prepare($sql);
+		$stmt->execute();
+		$rows = $stmt->rowCount();
+		
+		return $rows;
 	}
 }

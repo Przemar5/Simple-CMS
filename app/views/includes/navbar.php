@@ -19,13 +19,30 @@
 								<input type="checkbox" id="submenu-<?php echo $item['id']; ?>" class="navbar__submenu-toggler">
 								
 								<ul class="navbar__submenu-list">
+								<?php if (count($item['children'])): ?>
 									<?php foreach ($item['children'] as $submenuItem): ?>
-									<li class="navbar__submenu-item">
-										<a href="<?php echo $submenuItem['slug']; ?>">
-											<?php echo $submenuItem['label']; ?>
-										</a>
-									</li>
+									
+										<?php if (isset($submenuItem['children'])): ?>
+										<li>
+											<label for="submenu-<?php echo $item['id']; ?>" class="navbar__submenu-label">
+												<?php echo $submenuItem['label']; ?>
+											</label>
+
+											<input type="checkbox" id="submenu-<?php echo $item['id']; ?>" class="navbar__submenu-toggler">
+
+											<ul class="navbar__submenu-list">
+												<?php?>
+											</ul>
+										</li>
+										<?php else: ?>
+										<li class="navbar__submenu-item">
+											<a href="<?php echo $submenuItem['slug']; ?>">
+												<?php echo $submenuItem['label']; ?>
+											</a>
+										</li>
+										<?php endif; ?>
 									<?php endforeach; ?>
+								<?php endif; ?>
 								</ul>
 							<?php else: ?>
 								<a href="<?php echo $item['slug']; ?>">
@@ -92,13 +109,15 @@
 }
 
 .navbar__item {
-    margin-left: 5rem;
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
     display: flex;
     justify-content: center;
 }
 
 .navbar__item-submenu {
     position: relative;
+	top: 0;
 }
 
 .navbar__submenu-label {
@@ -122,12 +141,14 @@
 	display: blook;
 	width: 100%;
 	height: 5rem;
+	padding-top: 1rem;
+	padding-bottom: 1rem;
 }
 	
 .navbar__submenu-toggler:checked + .navbar__submenu-list {
 	display: block;
 	width: 100%;
-	height: 100px;
+	height: auto;
 	background-color: #333;
 	position: absolute;
 	top: 100%;
