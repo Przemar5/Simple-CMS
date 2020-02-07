@@ -35,7 +35,11 @@ Route::set('navbar', function() {
 });
 
 Route::set('navbar/submenus', function() {
-	NavbarController::addSubmenu($_POST);
+	switch ($_GET['action']) {
+		case 'store':	NavbarController::storeSubmenu($_POST);		break;
+		case 'update':	NavbarController::updateSubmenu($_POST);	break;
+		case 'delete':	NavbarController::deleteSubmenu($_POST);	break;
+	}
 });
 
 Route::set('add', function() {

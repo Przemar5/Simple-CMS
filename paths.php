@@ -17,6 +17,8 @@ define('CONTROLLERS_ROOT', APP_ROOT . '/app/controllers');
 define('ROUTES', APP_ROOT . '/routes.php');
 define('ADMIN_PANEL', BASE_URL . '/admin');
 define('NAVBAR_MANAGER', BASE_URL . '/navbar');
+define('NAVBAR_SUBMENUS', BASE_URL . '/navbar/submenus');
+define('NAVBAR_PAGES', BASE_URL . '/navbar/items');
 
 define('CONNECTION', APP_ROOT . '/app/connect/Connection.php');
 define('AUTH', APP_ROOT . '/app/controllers/AuthController.php');

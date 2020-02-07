@@ -11,7 +11,7 @@
 						<?php foreach($navbarItems as $item): ?>
 						<li class="navbar__item navbar__item-submenu">
 						
-							<?php if (isset($item['children'])): ?>
+							<?php if (!empty($item['children'])): ?>
 								<label for="submenu-<?php echo $item['id']; ?>" class="navbar__submenu-label">
 									<?php echo $item['label']; ?>
 								</label>

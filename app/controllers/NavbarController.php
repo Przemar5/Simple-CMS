@@ -1,5 +1,11 @@
 <?php
 
+if (!isset($_SESSION))
+{
+	session_start();
+}
+
+require_once(CONNECTION);
 require_once(MODELS_ROOT . '/Page.php');
 require_once(MODELS_ROOT . '/Navbar.php');
 require_once(MODELS_ROOT . '/Submenu.php');
@@ -73,23 +79,29 @@ class NavbarController
 		
 		for ($i = 0; $i < sizeof($items); $i++) {
 			if (self::isNotEmpty($items[$i])) {
+				//$result[$i] = $items[$i];
 				if (self::isLink($items[$i])) {
 					array_push($result, self::processLinkData($items[$i]));
-					$result[$i]['type'] = 'Link';
+					$result[$i]['type'] = 'link';
 				}
 				else if (self::isSubmenu($items[$i])) {
 					array_push($result, self::processSubmenuData($items[$i]));
-					$result[$i]['type'] = 'Submenu';
+					$result[$i]['type'] = 'submenu';
 				}
 				
 				if (self::isNotEmpty($items[$i]['parent_id'])) {
-					$result[$i]['parent_id'] = (Submenu::select($items[$i]['parent_id'])->fetch(PDO::FETCH_ASSOC))['label'];
+					$result[$i]['parent'] = (Submenu::select($items[$i]['parent_id'])->fetch(PDO::FETCH_ASSOC))['label'];
 				}
 				else {
-					$result[$i]['parent_id'] = 'None';
+					$result[$i]['parent'] = 'None';
 				}
 				
-				$result[$i]['item_index'] = $items[$i]['item_index'];
+				foreach ($items[$i] as $key => $value) {
+					$result[$i][$key] = $items[$i][$key];
+				}
+				
+				$result[$i]['url_edit'] = NAVBAR_SUBMENUS . '/update/' . $items[$i]['id'];
+				$result[$i]['url_delete'] = NAVBAR_SUBMENUS . '/delete/' . $items[$i]['id'];
 			}
 		}
 		
@@ -178,6 +190,12 @@ class NavbarController
 	public static function processSubmenuData($item)
 	{
 		return Submenu::select($item['submenu_id'])->fetch(PDO::FETCH_ASSOC);
+	}3
+	
+	
+	public static function hasParent($item)
+	{
+		return self::isNotEmpty($item['parent_id']);
 	}
 	
 	
@@ -193,14 +211,14 @@ class NavbarController
 	}
 	
 	
-	public static function addSubmenu($request)
+	public static function storeSubmenu($request)
 	{
 		$parent_id = $request['parent_id'];
 		$rules = [
-			'label' => ['required', 'between:3,55'],
-			'item_index' => ['required', 'between:1,3', 'numeric']
+			'label' => ['required', 'between:3,55', 'unique:navigation_submenus'],
 		];
 		$validator = new Validator;
+		print_r($request);die();
 		
 		if ((is_numeric($parent_id) && strlen($parent_id) < 10) || empty($parent_id)) {
 			if ($validator->validate($request, $rules)) {
@@ -210,6 +228,9 @@ class NavbarController
 				
 				if (self::normalizeItemIndexes($level) && empty($request['item_index'])) {
 					$request['item_index'] = sizeof($level) + 1;
+				}
+				else {
+					Navbar::increaseItemIndexes($request['item_index'], $request['parent_id']);
 				}
 				
 				if (Submenu::insert($param) === 1) {
@@ -223,17 +244,109 @@ class NavbarController
 					];
 					
 					if (Navbar::insertSubmenu($params)) {
-						$_SESSION['last_action']['success'] = 'New submenu was created successfully.';
-						
-						header('Location: ' . NAVBAR_MANAGER);
+						$_SESSION['last_action']['success'] = 'New submenu was created and added successfully.';
 					}
+				}
+				else {
+					$_SESSION['last_action']['error'] = 'Error: new submenu wasn\'t created.';
 				}
 			}
 		}
 		
-		$_SESSION['last_action']['error'] = 'Error: new submenu wasn\'t created.';
+		$_SESSION['input_errors'] = $validator->errors;
+		$_SESSION['submitted_data'] = $request;
 		
 		header('Location: ' . NAVBAR_MANAGER);
+	}
+	
+	
+	public static function deleteSubmenu($request)
+	{
+		$elementId = $request['id'];
+		$rules = [
+			'id' => ['required', 'between:1,7', 'numeric'],
+			'item_index' => ['required', 'between:1,7', 'numeric']
+		];
+		$validator = new Validator;
+		
+		if ($validator->validate($request, $rules)) {
+			$level = Navbar::wholeLevel($request['parent_id'])->fetchAll(PDO::FETCH_ASSOC);
+			$rows;
+			
+			if (self::isSubmenu($request)) {
+				self::replaceItemsToGrandparent($request['submenu_id'], $request['parent_id']);
+				Connection::delete()
+					->from('navigation_submenus')
+					->where([["id", "=", $request['submenu_id']]])
+					->execute();
+				$rows = Connection::delete()
+					->from("navigation_items")
+					->where([["submenu_id", "=", $request['submenu_id']]])
+					->execute()
+					->rowCount();
+			}
+			else if (self::isLink($request)) {
+				$rows = Connection::delete()
+					->from("navigation_items")
+					->where([["page_id", "=", $request['page_id']]])
+					->execute()
+					->rowCount();
+			}
+			
+			self::normalizeItemIndexes($level);
+			
+			if ($rows === 1) {
+				$_SESSION['last_action']['success'] = 'Item was removed successfully from navigation.';
+			}
+			else {
+				$_SESSION['last_action']['error'] = 'Error: Item wasn\'t removed from navigation.';
+			}
+		}
+		
+		header('Location: ' . NAVBAR_MANAGER);
+	}
+	
+	
+	public static function replaceItemsToGrandparent($submenuId, $parentId)
+	{
+		echo "<pre>";
+		
+		$params = [
+			'submenu_id' => $submenuId,
+			'parent_id' => $parentId
+		];
+		
+		require_once(APP_ROOT . '/app/connect/Database.php');		
+		
+		$grandParentId = Connection::select(["parent_id"])
+			->from("navigation_items")
+			->where([["submenu_id", "=", $parentId]])
+			->execute()
+			->fetch(PDO::FETCH_OBJ)
+			->parent_id;
+		
+		$count = Connection::count()
+			->from("navigation_items")
+			->where([["parent_id", "=", $grandParentId]])
+			->execute()
+			->fetch(PDO::FETCH_NUM)[0];
+		
+		$items = self::getLevelData($submenuId);
+		
+		if (self::isNotEmpty($items)) {
+			Navbar::increaseItemIndexes(0, $parentId, $count);
+			
+			Connection::update("navigation_items")
+				->set(["parent_id" => $grandParentId])
+				->where([["parent_id", "=", $submenuId]])
+				->execute();
+		}
+	}
+	
+	
+	public static function getGrandparentCount($submenuId)
+	{
+		return Navbar::countElements($submenuId);
 	}
 	
 	
@@ -255,7 +368,7 @@ class NavbarController
 		
 	}
 	
-	private static function toggleItemIndexes()
+	private static function pushItemIndexes($itemIndex, $sumnenu = null)
 	{
 		
 	}

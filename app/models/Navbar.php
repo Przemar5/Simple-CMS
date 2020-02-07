@@ -107,6 +107,44 @@ class Navbar
 	}
 	
 	
+	public static function deleteSubmenu($id)
+	{
+		$sql = "DELETE FROM navigation_items
+				WHERE id = :id";
+		$stmt = Connection::getInstance()->prepare($sql);
+		$stmt->execute(['id' => $id]);
+		$rows = $stmt->rowCount();
+		
+		return $rows;
+	}
+	
+	
+	public static function updateParent($params)
+	{
+		$sql = "UPDATE navigation_items
+				SET parent_id = :parent_id
+				WHERE parent_id = :submenu_id";
+		$stmt = Connection::getInstance()->prepare($sql);
+		$stmt->execute($params);
+		$rows = $stmt->rowCount();
+		
+		return $rows;
+	}
+	
+	
+	public static function countElements($submenuId)
+	{
+		$sql = "SELECT COUNT(*)
+				FROM navigation_items
+				WHERE submenu_id = :submenu_id";
+		$param = ['submenu_id' => $submenuId];
+		$stmt = Connection::getInstance()->prepare($sql);
+		$stmt->execute($param);
+		
+		return $stmt->fetch(PDO::FETCH_ASSOC)['COUNT(*)'];
+	}
+	
+	
 	public static function update($request)
 	{
 		$sql = 'UPDATE navigation_items
@@ -137,31 +175,47 @@ class Navbar
 	}
 	
 	
-	public static function increaseItemIndexes($submenu, $itemIndex)
+	public static function increaseItemIndexes($currentIndex, $parentId = null, $number = 1)
 	{
+		$params['item_index'] = $currentIndex;
 		$sql = 'UPDATE navigation_items 
-				SET item_index = item_index+1 
-				WHERE submenu_id = :submenu_id
-				AND item_index >= :item_index';
-		$param = ['item_index' => $itemIndex];
+				SET item_index = item_index+' . $number .
+				'WHERE parent_id ';
+		
+		if (!$parentId) {
+			$sql .= 'IS NULL ';
+		}
+		else {
+			$sql .= '= :parent_id ';
+			$params['parent_id'] = $parentId;
+		}
+		
+		$sql .= 'AND item_index >= :item_index';
 
         $stmt = Connection::getInstance()->prepare($sql);
-		$stmt->execute($param);
-		$rows = $stmt->rowCount();
+		$stmt->execute($params);
 	}
 	
 	
-	public static function decreaseItemIndexes($submenu, $currentIndex)
+	public static function decreaseItemIndexes($currentIndex, $parentId = null, $number = 1)
 	{
+		$params['item_index'] = $currentIndex;
 		$sql = 'UPDATE navigation_items 
-				SET item_index = item_index-1 
-				WHERE submenu_id = :submenu_id
-				AND item_index >= :item_index';
-		$param = ['item_index' => $itemIndex];
+				SET item_index = item_index-' . $number . 
+				'WHERE parent_id ';
+		
+		if (!$parentId) {
+			$sql .= 'IS NULL ';
+		}
+		else {
+			$sql .= '= :parent_id ';
+			$params['parent_id'] = $parentId;
+		}
+		
+		$sql .= 'AND item_index >= :item_index';
 
         $stmt = Connection::getInstance()->prepare($sql);
-		$stmt->execute($param);
-		$rows = $stmt->rowCount();
+		$stmt->execute($params);
 	}
 	
 	public static function normalizeIndexes()

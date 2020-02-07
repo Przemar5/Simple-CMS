@@ -1,4 +1,6 @@
 <?php require_once(HEADER); ?>
+   
+	<?php include_once(ACTION_FEEDBACK); ?>
 
     <h2>Manage navbar</h2>
 
@@ -74,18 +76,22 @@
 						<?php echo $item['type']; ?>
 					</td>
 					<td>
-						<?php echo $item['parent_id']; ?>
+						<?php echo $item['parent']; ?>
 					</td>
 					<td>
 						<?php echo $item['item_index']; ?>
 					</td>
 					<td>
-						<a href="<?php echo $page['url_edit']; ?>" class="btn btn-sm btn-primary">
+						<a href="<?php echo $item['url_edit']; ?>" class="btn btn-sm btn-primary">
 							Edit
 						</a>
 						
-						<form action="<?php echo $page['url_delete']; ?>" method="post">
-							<input type="hidden" name="id" value="<?php echo $page['id']; ?>">
+						<form action="<?php echo $item['url_delete']; ?>" method="post">
+							<input type="hidden" name="id" value="<?php echo $item['id']; ?>">
+							<input type="hidden" name="page_id" value="<?php echo $item['page_id']; ?>">
+							<input type="hidden" name="submenu_id" value="<?php echo $item['submenu_id']; ?>">
+							<input type="hidden" name="parent_id" value="<?php echo $item['parent_id']; ?>">
+							<input type="hidden" name="item_index" value="<?php echo $item['item_index']; ?>">
 							<input class="btn btn-sm btn-danger" type="submit" value="Delete">
 						</form>
 					</td>

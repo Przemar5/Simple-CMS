@@ -95,14 +95,13 @@ class PageController
     public static function navbarManager()
     {
 		$data['label'] = APP_NAME . ' | Pages';
-		$data['url_add'] = BASE_URL . '/add';
 		
 		NavbarController::navbar();
 		$submenus = NavbarController::getSubmenus();
 		$navbarItems = NavbarController::getAllItems();
 		$navbarItems = NavbarController::prepareAsTable($navbarItems);
-		$data['url_submenu_add'] = NAVBAR_MANAGER . '/submenus/store';
-		$data['url_item_add'] = NAVBAR_MANAGER . '/items/store';
+		$data['url_submenu_add'] = NAVBAR_SUBMENUS . '/store';
+		$data['url_item_add'] = NAVBAR_PAGES . '/store';
 		
         require_once(VIEW['NAVBAR_MANAGER']);
 		

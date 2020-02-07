@@ -59,7 +59,7 @@ class Submenu
 	
 	public static function update($request)
 	{
-		$sql = 'UPDATE navigation_items
+		$sql = 'UPDATE navigation_submenus
 				SET title = :title,
 					label = :label,
 					slug = :slug,
@@ -75,7 +75,7 @@ class Submenu
 	
 	public static function delete($id)
 	{
-        $sql = 'DELETE FROM navigation_items 
+        $sql = 'DELETE FROM navigation_submenus 
 				WHERE id=:id';
         $param = ['id' => $id];
 
