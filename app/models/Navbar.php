@@ -81,6 +81,20 @@ class Navbar
 	}
 	
 	
+	public static function selectByParent($parentId)
+	{
+		$sql = 'SELECT *
+				FROM navigation_items
+				WHERE parent_id = :parent_id
+				ORDER BY item_index ASC';
+		$param = ['parent_id' => $parentId];
+		$stmt = Connection::getInstance()->prepare($sql);
+		$stmt->execute($param);
+		
+		return $stmt;
+	}
+	
+	
 	public static function insert($request)
 	{
 		$sql = 'INSERT INTO navigation_submenus 

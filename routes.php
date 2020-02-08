@@ -3,7 +3,8 @@
 
 require_once(CONTROLLERS_ROOT . '/Route.php');
 require_once(CONTROLLERS_ROOT . '/PageController.php');
-require_once(CONTROLLERS_ROOT . '/NavbarController.php');
+//require_once(CONTROLLERS_ROOT . '/NavbarController.php');
+require_once(CONTROLLERS_ROOT . '/NavbarController2.php');
 require_once(CONTROLLERS_ROOT . '/ContactMailController.php');
 require_once(CONTROLLERS_ROOT . '/SearchController.php');
 

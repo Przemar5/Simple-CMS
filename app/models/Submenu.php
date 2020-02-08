@@ -45,6 +45,19 @@ class Submenu
 	}
 	
 	
+	public static function selectByParent($parentId)
+	{
+		$sql = 'SELECT * 
+				FROM navigation_items 
+				WHERE parent_id = :parent_id
+				ORDER BY item_index ASC';
+		$stmt = Connection::getInstance()->prepare($sql);
+		$stmt->execute(['parent_id' => $parentId]);
+		
+		return $stmt;
+	}
+	
+	
 	public static function insert($request)
 	{
 		$sql = 'INSERT INTO navigation_submenus (label) 

@@ -96,11 +96,22 @@ class PageController
     {
 		$data['label'] = APP_NAME . ' | Pages';
 		
+		/*
 		NavbarController::navbar();
 		$submenus = NavbarController::getSubmenus();
 		$navbarItems = NavbarController::getAllItems();
 		$navbarItems = NavbarController::prepareAsTable($navbarItems);
 		$data['url_submenu_add'] = NAVBAR_SUBMENUS . '/store';
+		*/
+		$navbar = NavbarController2::getInstance();
+		$navbar = $navbar::getRawData()
+			->filterBaseLevel()
+			->createNavigationTree();
+		
+		echo "<pre>";
+		print_r($navbar::$navigationTree);
+		die();
+		
 		$data['url_item_add'] = NAVBAR_PAGES . '/store';
 		
         require_once(VIEW['NAVBAR_MANAGER']);
