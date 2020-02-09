@@ -1,4 +1,10 @@
-    	
+<?php
+
+//	echo "<pre>";
+//	print_r($navigationItems);
+//	die();
+
+?>    	
     	<nav role="navigation">
     		<div class="navbar">
     			<a href="<?php echo HOME; ?>" class="navbar__brand">
@@ -7,11 +13,14 @@
     			
 				<ul class="navbar__list">
    				
-    				<?php if (count($navbarItems)): ?>
-						<?php foreach($navbarItems as $item): ?>
+    				<?php if (count($navigationItems)): ?>
+    				
+						<?php foreach($navigationItems as $item): ?>
+						
 						<li class="navbar__item navbar__item-submenu">
 						
 							<?php if (!empty($item['children'])): ?>
+							
 								<label for="submenu-<?php echo $item['id']; ?>" class="navbar__submenu-label">
 									<?php echo $item['label']; ?>
 								</label>
@@ -19,10 +28,13 @@
 								<input type="checkbox" id="submenu-<?php echo $item['id']; ?>" class="navbar__submenu-toggler">
 								
 								<ul class="navbar__submenu-list">
+								
 								<?php if (count($item['children'])): ?>
+								
 									<?php foreach ($item['children'] as $submenuItem): ?>
 									
 										<?php if (isset($submenuItem['children'])): ?>
+										
 										<li>
 											<label for="submenu-<?php echo $item['id']; ?>" class="navbar__submenu-label">
 												<?php echo $submenuItem['label']; ?>
@@ -34,24 +46,35 @@
 												<?php?>
 											</ul>
 										</li>
+										
 										<?php else: ?>
+										
 										<li class="navbar__submenu-item">
 											<a href="<?php echo $submenuItem['slug']; ?>">
 												<?php echo $submenuItem['label']; ?>
 											</a>
 										</li>
+										
 										<?php endif; ?>
+										
 									<?php endforeach; ?>
+									
 								<?php endif; ?>
+								
 								</ul>
+								
 							<?php else: ?>
+							
 								<a href="<?php echo $item['slug']; ?>">
 									<?php echo $item['label']; ?>
 								</a>
+								
 							<?php endif; ?>
 							
 						</li>
+						
 						<?php endforeach; ?>
+   				
     				<?php endif; ?>
     				
 				</ul>

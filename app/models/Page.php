@@ -96,6 +96,20 @@ class Page extends Model
 	}
 	
 	
+	public static function selectProperties($id, $properties = [])
+	{
+		$sql = "SELECT ";
+		$sql .= implode(', ', $properties);
+		$sql .=	" FROM pages
+				WHERE id = :id";
+		$param = ["id" => $id];
+		$stmt = Connection::getInstance()->prepare($sql);
+		$stmt->execute($param);
+		
+		return $stmt;
+	}
+	
+	
 	public static function insert($request)
 	{
 		$sql = 'INSERT INTO pages 

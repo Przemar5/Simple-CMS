@@ -6,6 +6,7 @@ require_once(MODELS_ROOT . '/Submenu.php');
 class SubmenuController extends NavbarController2
 {
 	public $properties;
+	public $test;
 	
 	
 	public function __construct($properties)
@@ -47,7 +48,9 @@ class SubmenuController extends NavbarController2
 				}
 				else if (self::isSubmenu($item)) {
 					$item = new SubmenuController($item);
-					$item = $item->getData();
+					$item = $item->getData()
+						->getChildren()
+						->parseData();
 
 					echo "<pre>";
 					print_r($item);

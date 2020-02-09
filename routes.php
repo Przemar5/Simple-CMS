@@ -5,6 +5,8 @@ require_once(CONTROLLERS_ROOT . '/Route.php');
 require_once(CONTROLLERS_ROOT . '/PageController.php');
 //require_once(CONTROLLERS_ROOT . '/NavbarController.php');
 require_once(CONTROLLERS_ROOT . '/NavbarController2.php');
+require_once(CONTROLLERS_ROOT . '/classes/NavbarSubmenu.php');
+require_once(CONTROLLERS_ROOT . '/classes/NavbarLink.php');
 require_once(CONTROLLERS_ROOT . '/ContactMailController.php');
 require_once(CONTROLLERS_ROOT . '/SearchController.php');
 
@@ -37,9 +39,9 @@ Route::set('navbar', function() {
 
 Route::set('navbar/submenus', function() {
 	switch ($_GET['action']) {
-		case 'store':	NavbarController::storeSubmenu($_POST);		break;
-		case 'update':	NavbarController::updateSubmenu($_POST);	break;
-		case 'delete':	NavbarController::deleteSubmenu($_POST);	break;
+		case 'store':	NavbarSubmenu::store($_POST);	break;
+		case 'update':	NavbarSubmenu::update($_POST);	break;
+		case 'delete':	NavbarSubmenu::delete($_POST);	break;
 	}
 });
 

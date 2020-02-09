@@ -8,7 +8,9 @@ define('NAMES', APP_ROOT . '/names.php');
 
 define('MODELS_ROOT', APP_ROOT . '/app/models');
 define('MODEL', APP_ROOT . '/app/models/Model.php');
+define('CLASSES', APP_ROOT . '/app/classes');
 define('VIEW_ROOT', APP_ROOT . '/app/views');
+define('INCLUDES', VIEW_ROOT . '/includes');
 define('NAVBAR', VIEW_ROOT . '/includes/navbar.php');
 define('ACTION_FEEDBACK', VIEW_ROOT . '/includes/action_feedback.php');
 define('HEADER', VIEW_ROOT . '/templates/header.php');
@@ -38,7 +40,7 @@ define('VIEW', [
 	'PAGE'				=>	APP_ROOT . '/app/views/pages/page.php',
 	'SEARCH'			=>	APP_ROOT . '/app/views/pages/search.php',
 	'LIST_PAGES'		=>	APP_ROOT . '/app/views/admin/list.php',
-	'NAVBAR_MANAGER'	=>	APP_ROOT . '/app/views/admin/navbar_manager.php',
+	'NAVBAR_MANAGER'	=>	APP_ROOT . '/app/views/admin/navbar/navbar_manager.php',
 	'ADD_PAGE'			=>	APP_ROOT . '/app/views/admin/add.php',
 	'EDIT_PAGE'			=>	APP_ROOT . '/app/views/admin/edit.php',
 	'CONTACT_MAIL'		=>	APP_ROOT . '/app/views/emails/contact.php',

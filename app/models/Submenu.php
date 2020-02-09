@@ -23,8 +23,8 @@ class Submenu
 	public static function all()
 	{
 		$sql = 'SELECT * 
-				FROM navigation_items 
-				ORDER BY item_index ASC';
+				FROM navigation_submenus 
+				ORDER BY id ASC';
 		$stmt = Connection::getInstance()->prepare($sql);
 		$stmt->execute();
 		
@@ -41,18 +41,19 @@ class Submenu
 		$stmt = Connection::getInstance()->prepare($sql);
 		$stmt->execute($param);
 		
-		return $stmt;
+		return $stmt->fetch(PDO::FETCH_ASSOC);
 	}
 	
 	
-	public static function selectByParent($parentId)
+	public static function selectProperties($id, $properties = [])
 	{
-		$sql = 'SELECT * 
-				FROM navigation_items 
-				WHERE parent_id = :parent_id
-				ORDER BY item_index ASC';
+		$sql = "SELECT ";
+		$sql .= implode(', ', $properties);
+		$sql .=	" FROM navigation_submenus
+				WHERE id = :id";
+		$param = ["id" => $id];
 		$stmt = Connection::getInstance()->prepare($sql);
-		$stmt->execute(['parent_id' => $parentId]);
+		$stmt->execute($param);
 		
 		return $stmt;
 	}

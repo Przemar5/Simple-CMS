@@ -95,7 +95,7 @@ class Validator
 	
     public function required($value)
     {
-		$condition = !empty($value);
+		$condition = isset($value);
 		$errorMsg = "This value is required.";
 		
 		return $this->executeCondition($condition, $errorMsg);
@@ -187,16 +187,16 @@ class Validator
 		$db = Connection::getInstance();
 
 		$key = $this->currentKey;
-        $sql = "SELECT id FROM $params[0] WHERE $key = :$key";
-        $params = [
-			$key => $value,
+        $sql = "SELECT id FROM $params[0] WHERE $params[1] = :$params[1]";
+        $sqlParams = [
+			$params[1] => $value,
 		];
 		
 		$stmt = $db->prepare($sql);
-		$stmt->execute($params);
+		$stmt->execute($sqlParams);
         $rows = $stmt->rowCount();
 
-        if ($rows === 0) {
+        if ($rows !== 0) {
             return true;
         }
         else {
@@ -204,5 +204,16 @@ class Validator
 
             return false;
         }
+	}
+	
+	
+	public function exists_or($value, $params)
+	{
+		if ($value == $params[2]) {
+            return true;
+        }
+        else {
+			return $this->exists($value, $params);
+		}
 	}
 }

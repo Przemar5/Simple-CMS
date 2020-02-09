@@ -45,7 +45,8 @@ class Navbar
 	{
 		$sql = 'SELECT * 
 				FROM navigation_items 
-				WHERE parent_id IS NULL
+				WHERE parent_id IS NULL 
+					OR parent_id = 0
 				ORDER BY item_index ASC';
 		$stmt = Connection::getInstance()->prepare($sql);
 		$stmt->execute();
@@ -81,6 +82,31 @@ class Navbar
 	}
 	
 	
+	public static function selectCount($parentId)
+	{
+		$sql = 'SELECT COUNT(*)
+				FROM navigation_items
+				WHERE parent_id = :parent_id';
+		$param = ['parent_id' => $parentId];
+		$stmt = Connection::getInstance()->prepare($sql);
+		$stmt->execute($param);
+		
+		return $stmt->fetch(PDO::FETCH_NUM)[0];
+	}
+	
+	
+	public static function selectMainMenu()
+	{
+		$sql = 'SELECT *
+				FROM navigation_items
+				WHERE parent_id IS NULL';
+		$stmt = Connection::getInstance()->prepare($sql);
+		$stmt->execute();
+		
+		return $stmt;
+	}
+	
+	
 	public static function selectByParent($parentId)
 	{
 		$sql = 'SELECT *
@@ -95,11 +121,11 @@ class Navbar
 	}
 	
 	
-	public static function insert($request)
+	public static function insertLink($request)
 	{
-		$sql = 'INSERT INTO navigation_submenus 
-					(submenu_id, body) 
-				VALUES (:label, :title, :slug, :body)';
+		$sql = 'INSERT INTO navigation_items 
+					(id, page_id, submenu_id, item_index, parent_id) 
+				VALUES (NULL, :page_id, NULL, :item_index, :parent_id)';
 		$stmt = Connection::getInstance()->prepare($sql);
 		$stmt->execute($request);
 		$rows = $stmt->rowCount();
@@ -110,12 +136,16 @@ class Navbar
 	
 	public static function insertSubmenu($request)
 	{
-		$sql = "INSERT INTO navigation_items 
-					(submenu_id, item_index, parent_id) 
-				VALUES (:submenu_id, :item_index, :parent_id)";
+		$sql = 'INSERT INTO navigation_items 
+					(id, page_id, submenu_id, item_index, parent_id) 
+				VALUES (NULL, NULL, :submenu_id, :item_index, :parent_id)';
 		$stmt = Connection::getInstance()->prepare($sql);
 		$stmt->execute($request);
 		$rows = $stmt->rowCount();
+		
+//		echo "<pre>";
+//		$stmt->debugDumpParams();
+//		die();
 		
 		return $rows;
 	}
@@ -155,7 +185,7 @@ class Navbar
 		$stmt = Connection::getInstance()->prepare($sql);
 		$stmt->execute($param);
 		
-		return $stmt->fetch(PDO::FETCH_ASSOC)['COUNT(*)'];
+		return $stmt->fetch(PDO::FETCH_NUM)[0];
 	}
 	
 	
@@ -189,53 +219,59 @@ class Navbar
 	}
 	
 	
-	public static function increaseItemIndexes($currentIndex, $parentId = null, $number = 1)
+	public static function toggleParent($current, $requested)
 	{
-		$params['item_index'] = $currentIndex;
-		$sql = 'UPDATE navigation_items 
-				SET item_index = item_index+' . $number .
-				'WHERE parent_id ';
-		
-		if (!$parentId) {
-			$sql .= 'IS NULL ';
-		}
-		else {
-			$sql .= '= :parent_id ';
-			$params['parent_id'] = $parentId;
-		}
-		
-		$sql .= 'AND item_index >= :item_index';
+		$sql = 'UPDATE navigation_items
+				SET parent_id = :requested
+				WHERE parent_id = :current';
+		$params = [
+			'current' => $current,
+			'requested' => $requested
+		];
 
         $stmt = Connection::getInstance()->prepare($sql);
 		$stmt->execute($params);
+		$rows = $stmt->rowCount();
 	}
 	
 	
-	public static function decreaseItemIndexes($currentIndex, $parentId = null, $number = 1)
+	public static function changeParentItemIndexes($parentId = 0, $number = 1)
 	{
-		$params['item_index'] = $currentIndex;
 		$sql = 'UPDATE navigation_items 
-				SET item_index = item_index-' . $number . 
-				'WHERE parent_id ';
-		
-		if (!$parentId) {
-			$sql .= 'IS NULL ';
-		}
-		else {
-			$sql .= '= :parent_id ';
-			$params['parent_id'] = $parentId;
-		}
-		
-		$sql .= 'AND item_index >= :item_index';
+				SET item_index = item_index+(' . $number . ') 
+				WHERE parent_id = :parent_id';
+		$params = [
+			'item_index' => $currentIndex,
+			'parent_id' => $parentId,
+		];
 
         $stmt = Connection::getInstance()->prepare($sql);
 		$stmt->execute($params);
+		$rows = $stmt->rowCount();
+		
+		return $rows;
 	}
 	
-	public static function normalizeIndexes()
+	
+	public static function normalizeIndexes($parentId, $counter = 1)
 	{
+		$items = self::wholeLevel($parentId)
+			->fetchAll(PDO::FETCH_ASSOC);
+		$params = [];
 		
+		foreach ($items as $item) {
+			if ($item['id'] !== $counter) {
+				$params[$item['id']] = $counter;
+			}
+			
+			$counter++;
+		}
+		
+		if (!empty($params)) {
+			self::updateIndexes($params);
+		}
 	}
+	
 	
 	public static function updateIndexes($params)
 	{
