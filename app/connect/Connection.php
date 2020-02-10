@@ -145,7 +145,7 @@ class Connection extends PDO
 	}
 	
 	
-	public static function set($valuesList)
+	public static function set($valuesList, $string = false)
 	{
 		self::$query .= " SET";
 		$arrSize = sizeof($valuesList);
@@ -157,9 +157,9 @@ class Connection extends PDO
 			self::$query .= " $key =";
 			
 			if (!empty($valuesList[$key])) {
-				self::$query .= (is_numeric($valuesList[$key])) 
-					? " $valuesList[$key]" 
-					: " '$valuesList[$key]'";
+				self::$query .= ($string === true) 
+					? " '$valuesList[$key]'" 
+					: " $valuesList[$key]";
 			}
 			else {
 				self::$query .= " NULL";

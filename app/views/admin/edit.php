@@ -27,9 +27,9 @@
 
         <br>
 
-        <label for="navbar_place">
-            Display on navbar
-        	<select name="navbar_place" id="navbar_place">
+        <label for="parent_id">
+            In submenu
+        	<select name="parent_id" id="parent_id">
         		<option value="">
         			None
         		</option>
@@ -43,7 +43,15 @@
         		<?php endforeach; ?>
         	</select>
         </label>
-       	<?php  ?>
+       	<?php display_error('parent_id'); ?>
+
+        <br>
+
+        <label for="item_index">
+            On position
+        	<input type="number" name="item_index" id="item_index" value="0">
+        </label>
+       	<?php display_error('parent_id'); ?>
 
         <br>
 

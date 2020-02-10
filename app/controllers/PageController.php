@@ -7,6 +7,7 @@ if (!isset($_SESSION))
 
 require_once(AUTH);
 require_once(MODELS_ROOT . '/Page.php');
+require_once(CLASSES . '/NavbarLink.php');
 require_once('Validator.php');
 //require_once('Sanitizer.php');
 
@@ -19,6 +20,10 @@ class PageController
 		$data['page'] = Page::select($id)->fetch(PDO::FETCH_ASSOC);
 		$data['label'] = APP_NAME . ' | ' . $data['page']['label'];
 
+		$navbar = NavbarController2::getInstance();
+		$navbar::getNavigationTree();
+		$navbar::view();
+		
         require_once(VIEW['PAGE']);
     }
 	
@@ -32,8 +37,8 @@ class PageController
 			$data['pages'][$key]['url_show'] = BASE_URL . '/' . $data['pages'][$key]['slug'];
 		}
 		
-		$navbar = NavbarController::getInstance();
-		$navbar::getItems();
+		$navbar = NavbarController2::getInstance();
+		$navbar::getNavigationTree();
 		$navbar::view();
 		
         require_once(VIEW['HOME']);
@@ -45,6 +50,10 @@ class PageController
     public static function contact()
     {
 		$data['label'] = APP_NAME . ' | Contact us';
+		
+		$navbar = NavbarController2::getInstance();
+		$navbar::getNavigationTree();
+		$navbar::view();
 		
         require_once(VIEW['CONTACT']);
 		
@@ -60,6 +69,10 @@ class PageController
 		$search = new SearchController;
 		$pages = $search->search($phrase)->fetchAll(PDO::FETCH_ASSOC);
 		$foundInfo = $search->getFoundInfo();
+		
+		$navbar = NavbarController2::getInstance();
+		$navbar::getNavigationTree();
+		$navbar::view();
 		
 		foreach ($pages as $key => $value) {
 			$pages[$key]['url_show'] = BASE_URL . '/' . $pages[$key]['slug'];
@@ -82,7 +95,7 @@ class PageController
 		}
 		
 		$navbar = NavbarController2::getInstance();
-		$navbar::getSubmenus();
+		$navbar::getNavigationTree();
 		$navbar::view();
 		
         require_once(VIEW['LIST_PAGES']);
@@ -95,21 +108,13 @@ class PageController
     {
 		$data['label'] = APP_NAME . ' | Pages';
 		
-		/*
-		NavbarController::navbar();
-		$submenus = NavbarController::getSubmenus();
-		$navbarItems = NavbarController::getAllItems();
-		$navbarItems = NavbarController::prepareAsTable($navbarItems);
-		$data['url_submenu_add'] = NAVBAR_SUBMENUS . '/store';
-		*/
-		
 		$navbar = NavbarController2::getInstance();
 		$navbar::getNavigationTree();
 		$submenus = $navbar::getSubmenus();
 		$navigationItems = $navbar::getPreparedNavigationItems();
 		$navbar::view();
 		
-		$data['url_submenu_add'] = NAVBAR_SUBMENUS . '/store';
+		$data['url_submenu_add'] = SUBMENUS . '/store';
 		$data['url_item_add'] = NAVBAR_PAGES . '/store';
 		
         require_once(VIEW['NAVBAR_MANAGER']);
@@ -123,6 +128,10 @@ class PageController
 		$data['label'] = APP_NAME . ' | Add page';
 		$data['url_store'] = BASE_URL . '/store';
 		
+		$navbar = NavbarController2::getInstance();
+		$navbar::getNavigationTree();
+		$navbar::view();
+		
         require_once(VIEW['ADD_PAGE']);
 		
 		unset($_SESSION['submitted_data']);
@@ -132,22 +141,39 @@ class PageController
 
     public static function store($request)
     {
+		$pageRequest = [
+			'title' => $request['title'],
+			'label' => $request['label'],
+			'slug' => $request['slug'],
+			'body' => $request['body'],
+		];
         $rules = [
-            'title' => ['required', 'between:7,255', 'regex:[a-zA-Z0-9 _\/\*\+\-\#]', 'unique:pages'],
-            'label' => ['required', 'between:7,70', 'regex:[a-zA-Z0-9 _\/\*\+\-\#]', 'unique:pages'],
-            'slug' => ['required', 'between:3,255', 'regex:[a-zA-Z0-9-]', 'unique:pages'],
+            'title' => ['required', 'between:7,255', 'regex:[a-zA-Z0-9 _\/\*\+\-\#]', /*'unique:pages'*/],
+            'label' => ['required', 'between:7,70', 'regex:[a-zA-Z0-9 _\/\*\+\-\#]', /*'unique:pages'*/],
+            'slug' => ['required', 'between:3,255', 'regex:[a-zA-Z0-9-]', /*'unique:pages'*/],
             'body' => ['required', 'min:3', /*'regex:[a-zA-Z0-9 _\/\*\+\-\#\n\r\<\>\,\.\?\:\;\(\)\[\]\"\'\^\%\@\!]'*/],
-        ];
+		];
         $validator = new Validator;
 
-        if ($validator->validate($request, $rules)) {
-            if (Page::insert($request) === 1) {
+        if ($validator->validate($pageRequest, $rules)) {
+            if (Page::insert($pageRequest) === 1) {
+				echo Page::lastInsertId();die();
+				
+				$navbarLinkRequest = [
+					'page_id' => 1,
+					'parent_id' => $request['parent_id'],
+					'item_index' => $request['item_index'],
+				];
+				
+				$navbarLink = new NavbarLink;
+				$navbarLink::store($navbarLinkRequest);
+				
                 $_SESSION['last_action']['success'] = 'New page was created successfully.';
             }
             else {
                 $_SESSION['last_action']['error'] = 'Error: new page wasn\'t created.';
             }
-
+			
             header('Location: ' . BASE_URL . '/admin');
 			die();
         }
@@ -171,6 +197,10 @@ class PageController
 		
 		$data['label'] = APP_NAME . ' | Edit ' . $page['label'];
 		$data['url_update'] = BASE_URL . '/' . $page['slug'] . '/update';
+		
+		$navbar = NavbarController2::getInstance();
+		$navbar::getNavigationTree();
+		$navbar::view();
 		
 		$navbarPages = Page::all();
 		

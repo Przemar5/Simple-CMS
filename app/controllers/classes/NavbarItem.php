@@ -17,9 +17,9 @@ class NavbarItem
 	public $parentId;
 	
 	
-	public function __construct($id = null)
+	public function __construct()
 	{
-		$this->id = $id;
+		//
 	}
 	
 	

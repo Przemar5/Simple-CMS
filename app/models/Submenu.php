@@ -45,6 +45,19 @@ class Submenu
 	}
 	
 	
+	public static function selectBySlug($slug)
+	{
+		$sql = 'SELECT *
+				FROM navigation_submenus
+				WHERE slug = :slug';
+		$param = ['slug' => $slug];
+		$stmt = Connection::getInstance()->prepare($sql);
+		$stmt->execute($param);
+		
+		return $stmt->fetch(PDO::FETCH_ASSOC);
+	}
+	
+	
 	public static function selectProperties($id, $properties = [])
 	{
 		$sql = "SELECT ";
@@ -61,8 +74,8 @@ class Submenu
 	
 	public static function insert($request)
 	{
-		$sql = 'INSERT INTO navigation_submenus (label) 
-				VALUES (:label)';
+		$sql = 'INSERT INTO navigation_submenus (label, slug) 
+				VALUES (:label, :slug)';
 		$stmt = Connection::getInstance()->prepare($sql);
 		$stmt->execute($request);
 		$rows = $stmt->rowCount();
@@ -73,12 +86,10 @@ class Submenu
 	
 	public static function update($request)
 	{
-		$sql = 'UPDATE navigation_submenus
-				SET title = :title,
-					label = :label,
-					slug = :slug,
-					body = :body
-				WHERE id = :id';
+		$sql = "UPDATE navigation_submenus
+				SET label = :label,
+					slug = :slug
+				WHERE id = :id";
 		$stmt = Connection::getInstance()->prepare($sql);
 		$stmt->execute($request);
 		$rows = $stmt->rowCount();

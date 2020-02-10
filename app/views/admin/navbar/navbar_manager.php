@@ -15,6 +15,14 @@
 
         <br>
 
+        <label for="slug">
+            Slug
+            <input type="text" name="slug" id="slug" value="<?php submitted_data('slug'); ?>">
+        </label>
+       	<?php display_error('slug'); ?>
+
+        <br>
+
         <label for="parent_id">
             In submenu
         	<select name="parent_id" id="parent_id">
@@ -64,6 +72,7 @@
     		<thead>
     			<th>Id</th>
     			<th>Label</th>
+    			<th>Slug</th>
     			<th>Type</th>
     			<th>Parent</th>
     			<th>Index</th>
@@ -78,6 +87,9 @@
 					</td>
 					<td>
 						<?php echo $item['label']; ?>
+					</td>
+					<td>
+						<?php echo $item['slug']; ?>
 					</td>
 					<td>
 						<?php echo $item['type']; ?>
@@ -95,10 +107,7 @@
 						
 						<form action="<?php echo $item['url_delete']; ?>" method="post">
 							<input type="hidden" name="id" value="<?php echo $item['id']; ?>">
-							<input type="hidden" name="page_id" value="<?php echo $item['page_id']; ?>">
-							<input type="hidden" name="submenu_id" value="<?php echo $item['submenu_id']; ?>">
-							<input type="hidden" name="parent_id" value="<?php echo $item['parent_id']; ?>">
-							<input type="hidden" name="item_index" value="<?php echo $item['item_index']; ?>">
+							
 							<input class="btn btn-sm btn-danger" type="submit" value="Delete">
 						</form>
 					</td>

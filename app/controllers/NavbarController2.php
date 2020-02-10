@@ -66,12 +66,14 @@ class NavbarController2
 		
 		foreach (self::$navigationItems as &$item) {
 			if (self::isLink($item)) {
-				$navbarItem = new NavbarLink($item['id']);
+				$navbarItem = new NavbarLink;
+				$navbarItem->id = $item['id'];
 				$navbarItem = $navbarItem->getData();
 				$item['type'] = 'Link';
 			}
 			else if (self::isMenu($item)) {
-				$navbarItem = new NavbarSubmenu($item['id']);
+				$navbarItem = new NavbarSubmenu;
+				$navbarItem->id = $item['id'];
 				$navbarItem = $navbarItem->getData();
 				$item['type'] = 'Submenu';
 			}
@@ -83,8 +85,8 @@ class NavbarController2
 				$item['parent'] = 'Navbar';
 			}
 			
-			$item['url_edit'] = NAVBAR_SUBMENUS . '/update/' . $item['id'];
-			$item['url_delete'] = NAVBAR_SUBMENUS . '/delete/' . $item['id'];
+			$item['url_edit'] = SUBMENUS . '/' . $navbarItem['slug'] . '/edit';
+			$item['url_delete'] = SUBMENUS . '/' . $navbarItem['slug'] . '/delete';
 			
 			$item = array_merge($item, $navbarItem);
 		}
@@ -108,22 +110,25 @@ class NavbarController2
 		
 		foreach ($navigationTree as $item) {
 			if (self::isLink($item)) {
-				$navbarItem = new NavbarLink($item['id']);
-				$navbarItem = $navbarItem->getData();
+				$navbarItem = new NavbarLink;
+				$navbarItem->id = $item['id'];
 			}
 			else if (self::isMenu($item)) {
-				$navbarItem = new NavbarSubmenu($item['id']);
+				$navbarItem = new NavbarSubmenu;
+				$navbarItem->id = $item['id'];
 				$navbarItem = $navbarItem->getData();
 				$navbarItem['children'] = [];
 				$children = Navbar::wholeLevel($item['submenu_id'])->fetchAll(PDO::FETCH_ASSOC);
 				
 				foreach ($children as $child) {
 					if (self::isLink($child)) {
-						$element = new NavbarLink($child['id']);
+						$element = new NavbarLink;
+						$element->id = $child['id'];
 						$element = $element->getData();
 					}
 					else if (self::isMenu($child)) {
-						$element = new NavbarSubmenu($child['id']);
+						$element = new NavbarSubmenu;
+						$element->id = $child['id'];
 						$element = $element->getData();
 						
 						$element['children'] = [];
@@ -131,11 +136,13 @@ class NavbarController2
 
 						foreach ($grandChildren as $grandChild) {
 							if (self::isLink($grandChild)) {
-								$subElement = new NavbarLink($grandChild['id']);
+								$subElement = new NavbarLink;
+								$subElement->id = $grandChild['id'];
 								$subElement = $subElement->getData();
 							}
 							else if (self::isMenu($grandChild)) {
-								$subElement = new NavbarSubmenu($grandChild['id']);
+								$subElement = new NavbarSubmenu;
+								$subElement->id = $grandChild['id'];
 								$subElement = $subElement->getData();
 							}
 
@@ -161,53 +168,7 @@ class NavbarController2
 
 		}
 	}
-		
-//		$parent_id = $request['parent_id'];
-//		$rules = [
-//			'label' => ['required', 'between:3,55', 'unique:navigation_submenus'],
-//		];
-//		$validator = new Validator;
-//		print_r($request);die();
-//		
-//		if ((is_numeric($parent_id) && strlen($parent_id) < 10) || empty($parent_id)) {
-//			if ($validator->validate($request, $rules)) {
-//				$param = ['label' => $request['label']];
-//				
-//				$level = Navbar::wholeLevel($request['parent_id'])->fetchAll(PDO::FETCH_ASSOC);
-//				
-//				if (self::normalizeItemIndexes($level) && empty($request['item_index'])) {
-//					$request['item_index'] = sizeof($level) + 1;
-//				}
-//				else {
-//					Navbar::increaseItemIndexes($request['item_index'], $request['parent_id']);
-//				}
-//				
-//				if (Submenu::insert($param) === 1) {
-//					// I already have no idea if using this variable is good idea.
-//					// I wonder how would it work submitting many forms at the same time
-//					$lastInsertId = Submenu::lastInsertId();
-//					$params = [
-//						'submenu_id' => $lastInsertId,
-//						'item_index' => $request['item_index'],
-//						'parent_id' => $request['parent_id']
-//					];
-//					
-//					if (Navbar::insertSubmenu($params)) {
-//						$_SESSION['last_action']['success'] = 'New submenu was created and added successfully.';
-//					}
-//				}
-//				else {
-//					$_SESSION['last_action']['error'] = 'Error: new submenu wasn\'t created.';
-//				}
-//			}
-//		}
-//		
-//		$_SESSION['input_errors'] = $validator->errors;
-//		$_SESSION['submitted_data'] = $request;
-//		
-//		header('Location: ' . NAVBAR_MANAGER);
-	
-	
+
 	
 	public static function view()
 	{

@@ -82,6 +82,20 @@ class Navbar
 	}
 	
 	
+	public static function selectBy($params)
+	{
+		$key = array_key_first($params);
+		$sql = "SELECT *
+				FROM navigation_items
+				WHERE $key = :$key";
+		$param = ["$key" => $params[$key]];
+		$stmt = Connection::getInstance()->prepare($sql);
+		$stmt->execute($param);
+		
+		return $stmt;
+	}
+	
+	
 	public static function selectCount($parentId)
 	{
 		$sql = 'SELECT COUNT(*)
@@ -139,6 +153,24 @@ class Navbar
 		$sql = 'INSERT INTO navigation_items 
 					(id, page_id, submenu_id, item_index, parent_id) 
 				VALUES (NULL, NULL, :submenu_id, :item_index, :parent_id)';
+		$stmt = Connection::getInstance()->prepare($sql);
+		$stmt->execute($request);
+		$rows = $stmt->rowCount();
+		
+//		echo "<pre>";
+//		$stmt->debugDumpParams();
+//		die();
+		
+		return $rows;
+	}
+	
+	
+	public static function updateSubmenu($request)
+	{
+		$sql = 'UPDATE navigation_items 
+				SET item_index = :item_index,
+					parent_id = :parent_id
+				WHERE submenu_id = :submenu_id';
 		$stmt = Connection::getInstance()->prepare($sql);
 		$stmt->execute($request);
 		$rows = $stmt->rowCount();

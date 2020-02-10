@@ -8,7 +8,7 @@ define('NAMES', APP_ROOT . '/names.php');
 
 define('MODELS_ROOT', APP_ROOT . '/app/models');
 define('MODEL', APP_ROOT . '/app/models/Model.php');
-define('CLASSES', APP_ROOT . '/app/classes');
+define('CLASSES', APP_ROOT . '/app/controllers/classes');
 define('VIEW_ROOT', APP_ROOT . '/app/views');
 define('INCLUDES', VIEW_ROOT . '/includes');
 define('NAVBAR', VIEW_ROOT . '/includes/navbar.php');
@@ -19,8 +19,8 @@ define('CONTROLLERS_ROOT', APP_ROOT . '/app/controllers');
 define('ROUTES', APP_ROOT . '/routes.php');
 define('ADMIN_PANEL', BASE_URL . '/admin');
 define('NAVBAR_MANAGER', BASE_URL . '/navbar');
-define('NAVBAR_SUBMENUS', BASE_URL . '/navbar/submenus');
 define('NAVBAR_PAGES', BASE_URL . '/navbar/items');
+define('SUBMENUS', BASE_URL . '/navbar/submenus');
 
 define('CONNECTION', APP_ROOT . '/app/connect/Connection.php');
 define('AUTH', APP_ROOT . '/app/controllers/AuthController.php');
@@ -41,6 +41,7 @@ define('VIEW', [
 	'SEARCH'			=>	APP_ROOT . '/app/views/pages/search.php',
 	'LIST_PAGES'		=>	APP_ROOT . '/app/views/admin/list.php',
 	'NAVBAR_MANAGER'	=>	APP_ROOT . '/app/views/admin/navbar/navbar_manager.php',
+	'SUBMENUS'			=>	APP_ROOT . '/app/views/admin/navbar/submenus',
 	'ADD_PAGE'			=>	APP_ROOT . '/app/views/admin/add.php',
 	'EDIT_PAGE'			=>	APP_ROOT . '/app/views/admin/edit.php',
 	'CONTACT_MAIL'		=>	APP_ROOT . '/app/views/emails/contact.php',
